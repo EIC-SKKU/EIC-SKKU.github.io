@@ -1,0 +1,489 @@
+---
+import { getCollection } from "astro:content";
+import Base from "../layouts/Base.astro";
+import PageHeader from "../components/PageHeader.astro";
+import { buildMemberDisambiguation } from "../lib/authors";
+import { ROLE_LABELS } from "../lib/roles";
+
+const roleOrder = ["professor", "phd", "msphd", "ms", "undergrad"];
+const members = (await getCollection("members"))
+  .filter((member) => member.data.role !== "alumni" && member.data.gameEligible)
+  .sort((a, b) => {
+    const roleDifference = roleOrder.indexOf(a.data.role) - roleOrder.indexOf(b.data.role);
+    return roleDifference || a.data.order - b.data.order || a.data.name.localeCompare(b.data.name);
+  });
+
+const groups = roleOrder
+  .map((role) => ({
+    role,
+    label: ROLE_LABELS[role] ?? role,
+    members: members.filter((member) => member.data.role === role),
+  }))
+  .filter((group) => group.members.length > 0);
+
+const memberDisambiguation = buildMemberDisambiguation(members);
+const memberLabels = new Map<string, string>();
+for (const member of members) {
+  const disambiguation = memberDisambiguation.get(member.id);
+  if (!disambiguation) {
+    memberLabels.set(member.id, member.data.name);
+    continue;
+  }
+
+  const role = ROLE_LABELS[member.data.role] ?? member.data.role;
+  memberLabels.set(
+    member.id,
+    `${member.data.name} · ${role}${disambiguation.sameRoleOrdinal ? ` #${disambiguation.sameRoleOrdinal}` : ""}`
+  );
+}
+---
+
+<Base
+  title="Roulette"
+  description="A private member picker for EIC Lab."
+  noindex={true}
+>
+  <PageHeader kicker="EIC Lab" title="Member Roulette" />
+
+  <div class="container section" data-game>
+    <p class="intro">Choose a member pool, set the number of people, and spin.</p>
+    <div class="game-grid">
+      <section class="wheel-card card" aria-labelledby="wheel-title">
+        <div class="wheel-wrap">
+          <div class="pointer" aria-hidden="true"></div>
+          <div class="wheel" data-wheel>
+            <svg class="wheel-face" viewBox="0 0 100 100" role="img" aria-labelledby="wheel-svg-title">
+              <title id="wheel-svg-title">Roulette with the selected member names</title>
+              <g data-wheel-segments></g>
+            </svg>
+          </div>
+          <div class="wheel-center" aria-hidden="true">
+            <strong data-wheel-count>{members.length}</strong>
+            <span>members</span>
+          </div>
+        </div>
+
+        <div class="wheel-status" aria-live="polite" aria-atomic="true">
+          <span class="status-dot" aria-hidden="true"></span>
+          <span data-status id="wheel-title">Ready to spin</span>
+        </div>
+
+        <div class="results" data-results hidden>
+          <span class="result-label" data-result-label>Selected</span>
+          <ol data-result-list></ol>
+        </div>
+      </section>
+
+      <section class="controls card" aria-labelledby="pool-title">
+        <div class="control-head">
+          <h2 id="pool-title">Choose members</h2>
+          <div class="control-actions">
+            <button type="button" class="text-button" data-shuffle>Shuffle order</button>
+            <button type="button" class="text-button" data-toggle-all>Clear all</button>
+          </div>
+        </div>
+
+        <div class="member-list" data-member-list>
+          {groups.map((group) => (
+            <fieldset class="program-group" data-group={group.role}>
+              <legend class="visually-hidden">{group.label}</legend>
+              <div class="program-head">
+                <span>
+                  {group.label}
+                  <small>{group.members.length}</small>
+                </span>
+                <button type="button" class="group-toggle" data-group-toggle={group.role}>
+                  Clear
+                </button>
+              </div>
+              <div class="program-members">
+                {group.members.map((member) => (
+                  <label class="member-option">
+                    <input
+                      type="checkbox"
+                      value={member.id}
+                      data-label={memberLabels.get(member.id)}
+                      data-role={group.role}
+                      checked
+                    />
+                    <span class="checkmark" aria-hidden="true">
+                      <svg viewBox="0 0 16 16"><path d="m3.5 8 3 3 6-6" /></svg>
+                    </span>
+                    <span>{memberLabels.get(member.id)}</span>
+                  </label>
+                ))}
+              </div>
+            </fieldset>
+          ))}
+        </div>
+
+        <div class="draw-control">
+          <div>
+            <label for="draw-count">Number to choose</label>
+          </div>
+          <div class="number-input">
+            <button type="button" data-decrease aria-label="Choose one fewer">−</button>
+            <input id="draw-count" data-draw-count type="number" min="1" value="1" inputmode="numeric" />
+            <button type="button" data-increase aria-label="Choose one more">+</button>
+          </div>
+        </div>
+
+        <button type="button" class="spin-button" data-spin>
+          <span>Spin the wheel</span>
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M5 12h14m-5-5 5 5-5 5" />
+          </svg>
+        </button>
+      </section>
+    </div>
+  </div>
+</Base>
+
+<script>
+  const root = document.querySelector<HTMLElement>("[data-game]");
+
+  if (root) {
+    const get = <T extends Element>(selector: string) => root.querySelector<T>(selector)!;
+    const wheel = get<HTMLElement>("[data-wheel]");
+    const segments = get<SVGGElement>("[data-wheel-segments]");
+    const wheelCount = get<HTMLElement>("[data-wheel-count]");
+    const status = get<HTMLElement>("[data-status]");
+    const results = get<HTMLElement>("[data-results]");
+    const resultLabel = get<HTMLElement>("[data-result-label]");
+    const resultList = get<HTMLOListElement>("[data-result-list]");
+    const countInput = get<HTMLInputElement>("[data-draw-count]");
+    const spinButton = get<HTMLButtonElement>("[data-spin]");
+    const toggleButton = get<HTMLButtonElement>("[data-toggle-all]");
+    const shuffleButton = get<HTMLButtonElement>("[data-shuffle]");
+    const decreaseButton = get<HTMLButtonElement>("[data-decrease]");
+    const increaseButton = get<HTMLButtonElement>("[data-increase]");
+    const groupButtons = [...root.querySelectorAll<HTMLButtonElement>("[data-group-toggle]")];
+    const boxes = [...root.querySelectorAll<HTMLInputElement>("[data-member-list] input")];
+    const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const svgNamespace = "http://www.w3.org/2000/svg";
+    const palette = ["#00265f", "#1c4a80", "#456b99", "#718baa", "#303438", "#53606d"];
+    const labelsById = new Map(
+      boxes.map((box) => [box.value, box.dataset.label ?? box.value])
+    );
+    let wheelOrder = boxes.map((box) => box.value);
+    let rotation = 0;
+    let spinning = false;
+
+    const selectedBoxes = () => boxes.filter((box) => box.checked);
+    const selectedMemberIds = () => {
+      const chosen = new Set(selectedBoxes().map((box) => box.value));
+      return wheelOrder.filter((memberId) => chosen.has(memberId));
+    };
+    const memberLabel = (memberId: string) => labelsById.get(memberId) ?? memberId;
+    const clampCount = (value: number, poolSize: number) =>
+      Math.min(Math.max(1, Number.isFinite(value) ? value : 1), Math.max(1, poolSize));
+
+    const secureIndex = (length: number) => {
+      if (!globalThis.crypto?.getRandomValues) return Math.floor(Math.random() * length);
+      const max = Math.floor(0x100000000 / length) * length;
+      const value = new Uint32Array(1);
+      do crypto.getRandomValues(value); while (value[0] >= max);
+      return value[0] % length;
+    };
+
+    const shuffledCopy = <T,>(items: T[]) => {
+      const shuffled = [...items];
+      for (let index = shuffled.length - 1; index > 0; index--) {
+        const pick = secureIndex(index + 1);
+        [shuffled[index], shuffled[pick]] = [shuffled[pick], shuffled[index]];
+      }
+      return shuffled;
+    };
+
+    const chooseWithoutReplacement = (pool: string[], amount: number) =>
+      shuffledCopy(pool).slice(0, amount);
+
+    const createSvg = <K extends keyof SVGElementTagNameMap>(name: K) =>
+      document.createElementNS(svgNamespace, name);
+
+    const polarPoint = (angle: number, radius = 49) => {
+      const radians = ((angle - 90) * Math.PI) / 180;
+      return { x: 50 + radius * Math.cos(radians), y: 50 + radius * Math.sin(radians) };
+    };
+
+    const createSegment = (memberId: string, index: number, size: number) => {
+      if (size === 1) {
+        const circle = createSvg("circle");
+        circle.setAttribute("cx", "50");
+        circle.setAttribute("cy", "50");
+        circle.setAttribute("r", "49");
+        circle.setAttribute("fill", palette[0]);
+        circle.dataset.member = memberId;
+        return circle;
+      }
+
+      const slice = 360 / size;
+      const startAngle = index * slice;
+      const endAngle = (index + 1) * slice;
+      const start = polarPoint(startAngle);
+      const end = polarPoint(endAngle);
+      const path = createSvg("path");
+      path.setAttribute(
+        "d",
+        `M 50 50 L ${start.x} ${start.y} A 49 49 0 ${slice > 180 ? 1 : 0} 1 ${end.x} ${end.y} Z`,
+      );
+      path.setAttribute("fill", palette[index % palette.length]);
+      path.setAttribute("stroke", "#ffffff");
+      path.setAttribute("stroke-width", ".35");
+      path.dataset.member = memberId;
+      return path;
+    };
+
+    const createNameLabel = (memberId: string, index: number, size: number) => {
+      const slice = 360 / size;
+      const angle = index * slice + slice / 2;
+      const group = createSvg("g");
+      group.setAttribute("transform", `rotate(${angle} 50 50)`);
+
+      const text = createSvg("text");
+      text.setAttribute("x", "50");
+      text.setAttribute("y", "17");
+      text.setAttribute("text-anchor", "middle");
+      text.setAttribute("dominant-baseline", "middle");
+      text.setAttribute("fill", "#ffffff");
+      text.setAttribute("font-family", "Inter Variable, sans-serif");
+      text.setAttribute("font-size", size > 12 ? "2.3" : size > 8 ? "2.65" : "3.1");
+      text.setAttribute("font-weight", "650");
+      text.setAttribute("transform", "rotate(-90 50 17)");
+      text.dataset.member = memberId;
+      text.textContent = memberLabel(memberId);
+      group.append(text);
+      return group;
+    };
+
+    const updateGroupToggles = () => {
+      groupButtons.forEach((button) => {
+        const role = button.dataset.groupToggle;
+        const groupBoxes = boxes.filter((box) => box.dataset.role === role);
+        button.textContent = groupBoxes.every((box) => box.checked) ? "Clear" : "Select";
+      });
+    };
+
+    const renderWheel = (pool: string[]) => {
+      const size = pool.length;
+      const fragment = document.createDocumentFragment();
+      if (!size) {
+        const empty = createSvg("circle");
+        empty.setAttribute("cx", "50");
+        empty.setAttribute("cy", "50");
+        empty.setAttribute("r", "49");
+        empty.setAttribute("fill", "#f4f4f5");
+        fragment.append(empty);
+      } else {
+        pool.forEach((memberId, index) => fragment.append(createSegment(memberId, index, size)));
+        pool.forEach((memberId, index) => fragment.append(createNameLabel(memberId, index, size)));
+      }
+      segments.replaceChildren(fragment);
+      wheel.classList.toggle("is-empty", !size);
+      wheelCount.textContent = String(size);
+    };
+
+    const setControlsDisabled = (disabled: boolean) => {
+      [...boxes, ...groupButtons, toggleButton, shuffleButton, decreaseButton, increaseButton, countInput]
+        .forEach((control) => (control.disabled = disabled));
+    };
+
+    const syncControls = (announce = true) => {
+      const pool = selectedMemberIds();
+      const size = pool.length;
+      renderWheel(pool);
+      countInput.max = String(Math.max(1, size));
+      countInput.value = String(clampCount(Number(countInput.value), size));
+      spinButton.disabled = size === 0 || spinning;
+      toggleButton.textContent = selectedBoxes().length === boxes.length ? "Clear all" : "Select all";
+      updateGroupToggles();
+      if (announce) {
+        status.textContent = size ? `${size} member${size === 1 ? "" : "s"} ready` : "Choose at least one member";
+      }
+    };
+
+    boxes.forEach((box) => box.addEventListener("change", () => syncControls()));
+
+    toggleButton.addEventListener("click", () => {
+      const shouldSelect = selectedBoxes().length !== boxes.length;
+      boxes.forEach((box) => (box.checked = shouldSelect));
+      syncControls();
+    });
+
+    groupButtons.forEach((button) => {
+      button.addEventListener("click", () => {
+        const groupBoxes = boxes.filter((box) => box.dataset.role === button.dataset.groupToggle);
+        const shouldSelect = !groupBoxes.every((box) => box.checked);
+        groupBoxes.forEach((box) => (box.checked = shouldSelect));
+        syncControls();
+      });
+    });
+
+    shuffleButton.addEventListener("click", () => {
+      wheelOrder = shuffledCopy(wheelOrder);
+      renderWheel(selectedMemberIds());
+      status.textContent = "Wheel order randomized";
+    });
+
+    const changeCount = (difference: number) => {
+      countInput.value = String(clampCount(Number(countInput.value) + difference, selectedMemberIds().length));
+    };
+    decreaseButton.addEventListener("click", () => changeCount(-1));
+    increaseButton.addEventListener("click", () => changeCount(1));
+    countInput.addEventListener("change", () => syncControls(false));
+
+    const wait = (milliseconds: number) =>
+      new Promise<void>((resolve) => window.setTimeout(resolve, milliseconds));
+
+    const nextFrame = () => new Promise<void>((resolve) => requestAnimationFrame(() => resolve()));
+
+    const spinTo = async (winnerIndex: number, poolSize: number, duration: number, turns: number) => {
+      const slice = 360 / poolSize;
+      const desiredModulo = ((-(winnerIndex * slice + slice / 2) % 360) + 360) % 360;
+      const currentModulo = ((rotation % 360) + 360) % 360;
+      rotation += turns * 360 + ((desiredModulo - currentModulo + 360) % 360);
+      wheel.style.transitionDuration = `${duration}ms`;
+      await nextFrame();
+
+      if (reduceMotion) {
+        wheel.style.transform = `rotate(${rotation}deg)`;
+        return;
+      }
+
+      await new Promise<void>((resolve) => {
+        let settled = false;
+        const finish = () => {
+          if (settled) return;
+          settled = true;
+          wheel.removeEventListener("transitionend", finish);
+          resolve();
+        };
+        wheel.addEventListener("transitionend", finish, { once: true });
+        window.setTimeout(finish, duration + 100);
+        wheel.style.transform = `rotate(${rotation}deg)`;
+      });
+    };
+
+    const appendWinner = (memberId: string, round: number, total: number) => {
+      const item = document.createElement("li");
+      item.textContent = memberLabel(memberId);
+      resultList.append(item);
+      resultLabel.textContent = `Selected ${round} of ${total}`;
+      results.hidden = false;
+    };
+
+    const markWinner = (memberId: string) => {
+      segments.querySelectorAll<SVGElement>("[data-member]").forEach((element) => {
+        if (element.dataset.member === memberId) element.setAttribute("opacity", ".3");
+      });
+    };
+
+    spinButton.addEventListener("click", async () => {
+      if (spinning) return;
+      const pool = selectedMemberIds();
+      if (!pool.length) return;
+      const amount = clampCount(Number(countInput.value), pool.length);
+      const winners = chooseWithoutReplacement(pool, amount);
+
+      spinning = true;
+      syncControls(false);
+      setControlsDisabled(true);
+      results.hidden = true;
+      resultList.replaceChildren();
+      status.textContent = "The wheel is spinning…";
+
+      for (const [roundIndex, winner] of winners.entries()) {
+        const round = roundIndex + 1;
+        const fastRound = roundIndex > 0;
+        status.textContent = `Draw ${round} of ${amount}${fastRound ? " — quick spin" : ""}`;
+        await spinTo(pool.indexOf(winner), pool.length, fastRound ? 650 : 3200, fastRound ? 2 : 6);
+        appendWinner(winner, round, amount);
+        markWinner(winner);
+        status.textContent = `${memberLabel(winner)} selected`;
+        if (round < amount) await wait(reduceMotion ? 150 : 450);
+      }
+
+      spinning = false;
+      setControlsDisabled(false);
+      spinButton.disabled = false;
+      status.textContent = amount === 1
+        ? `${memberLabel(winners[0])} was selected`
+        : `${amount} members selected`;
+    });
+
+    syncControls();
+  }
+</script>
+
+<style>
+  .intro { margin-bottom: 1.5rem; color: var(--ink-2); }
+  .game-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(360px, .92fr); gap: 1.25rem; align-items: start; }
+  .wheel-card { min-height: 570px; display: grid; place-items: center; align-content: center; padding: clamp(1.5rem, 4vw, 2.5rem); overflow: hidden; }
+
+  .wheel-wrap { position: relative; width: min(100%, 400px); aspect-ratio: 1; padding: 6px; border: 1px solid var(--line-strong); border-radius: 50%; background: #fff; }
+  .wheel { width: 100%; height: 100%; border-radius: 50%; position: relative; transition-property: transform; transition-timing-function: cubic-bezier(.12,.67,.12,1); }
+  .wheel-face { width: 100%; height: 100%; border-radius: 50%; }
+  .wheel-center { position: absolute; z-index: 3; inset: 50% auto auto 50%; transform: translate(-50%, -50%); width: 29%; aspect-ratio: 1; border: 1px solid var(--line); border-radius: 50%; background: white; display: grid; place-content: center; text-align: center; }
+  .wheel-center strong { color: var(--accent); font-size: clamp(1.4rem, 5vw, 2rem); line-height: 1; }
+  .wheel-center span { color: var(--ink-3); font-size: .7rem; white-space: nowrap; margin-top: .35rem; }
+  .pointer { position: absolute; z-index: 4; top: -4px; left: 50%; transform: translateX(-50%); width: 26px; height: 34px; background: var(--ink); clip-path: polygon(0 0, 100% 0, 50% 100%); }
+
+  .wheel-status { display: flex; align-items: center; gap: .5rem; margin-top: 1.5rem; min-height: 1.6rem; color: var(--ink-2); font-size: .9rem; font-weight: 550; }
+  .status-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); }
+  .results { width: 100%; margin-top: 1.25rem; padding-top: 1rem; border-top: 1px solid var(--line); text-align: center; }
+  .result-label { display: block; color: var(--ink-3); font-family: var(--mono); font-size: .7rem; letter-spacing: .12em; text-transform: uppercase; margin-bottom: .75rem; }
+  .results ol { display: flex; flex-wrap: wrap; justify-content: center; gap: .5rem; }
+  .results li { display: flex; align-items: center; gap: .45rem; padding: .38rem .75rem; color: var(--accent-strong); background: var(--accent-tint); border: 1px solid var(--accent-line); border-radius: 999px; font-size: .86rem; font-weight: 600; }
+  .results li::before { content: counter(list-item, decimal-leading-zero); color: var(--ink-3); font: .65rem var(--mono); }
+
+  .controls { padding: clamp(1.25rem, 3vw, 1.75rem); }
+  .control-head, .draw-control { display: flex; justify-content: space-between; align-items: center; gap: 1rem; }
+  .controls h2, .draw-control label { font-size: 1.05rem; font-weight: 650; line-height: 1.2; }
+  .control-actions { display: flex; align-items: center; gap: .2rem; }
+  .text-button { color: var(--accent); font-size: .82rem; font-weight: 600; min-height: 44px; padding-inline: .5rem; }
+  .text-button:disabled, .group-toggle:disabled { color: var(--ink-3); cursor: not-allowed; }
+
+  .member-list { margin: 1rem 0 1.25rem; max-height: 380px; overflow-y: auto; overscroll-behavior: contain; border: 1px solid var(--line); border-radius: var(--radius-sm); scrollbar-width: thin; }
+  .program-group { min-width: 0; margin: 0; padding: 0; border: 0; }
+  .program-group + .program-group { border-top: 1px solid var(--line); }
+  .program-head { width: 100%; min-height: 40px; display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: .4rem .65rem; background: var(--surface-2); color: var(--ink-2); font-size: .74rem; font-weight: 650; }
+  .program-head > span { display: flex; align-items: center; gap: .45rem; }
+  .program-head small { color: var(--ink-3); font: .66rem var(--mono); }
+  .group-toggle { min-height: 32px; padding-inline: .45rem; color: var(--accent); font-size: .72rem; font-weight: 650; }
+  .program-members { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .member-option { min-width: 0; min-height: 46px; display: grid; grid-template-columns: 22px minmax(0, 1fr); align-items: center; gap: .55rem; padding: .45rem .65rem; background: var(--surface); cursor: pointer; transition: background-color .15s ease; }
+  .member-option:hover { background: var(--surface-2); }
+  .member-option input { position: absolute; opacity: 0; pointer-events: none; }
+  .checkmark { width: 20px; height: 20px; display: grid; place-items: center; border: 1px solid var(--line-strong); border-radius: 5px; background: #fff; transition: .15s ease; }
+  .checkmark svg { width: 15px; fill: none; stroke: #fff; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; opacity: 0; }
+  input:checked + .checkmark { background: var(--accent); border-color: var(--accent); }
+  input:checked + .checkmark svg { opacity: 1; }
+  input:focus-visible + .checkmark { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .member-option > span:last-child { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: .86rem; }
+
+  .draw-control { padding: .25rem 0 1.2rem; border-top: 1px solid var(--line); padding-top: 1.2rem; }
+  .number-input { display: grid; grid-template-columns: 42px 48px 42px; height: 44px; border: 1px solid var(--line-strong); border-radius: 999px; overflow: hidden; }
+  .number-input button { background: var(--surface-2); font-size: 1.2rem; }
+  .number-input input { width: 100%; border: 0; border-inline: 1px solid var(--line); text-align: center; font: 650 .95rem var(--sans); color: var(--ink); appearance: textfield; }
+  .number-input input::-webkit-inner-spin-button { appearance: none; }
+  .spin-button { width: 100%; min-height: 48px; display: flex; justify-content: center; align-items: center; gap: .65rem; border-radius: 999px; background: var(--accent); color: white; font-size: .9rem; font-weight: 600; transition: background-color .15s ease; }
+  .spin-button:hover:not(:disabled) { background: var(--accent-strong); }
+  .spin-button:disabled { opacity: .45; cursor: not-allowed; }
+  .spin-button svg { width: 19px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+
+  @media (max-width: 820px) {
+    .game-grid { grid-template-columns: 1fr; }
+    .wheel-card { min-height: auto; }
+    .controls { order: -1; }
+  }
+
+  @media (max-width: 480px) {
+    .control-head { align-items: flex-start; }
+    .control-actions { flex-direction: column; align-items: flex-end; gap: 0; }
+    .text-button { min-height: 32px; }
+    .wheel-card { padding: 1.5rem 1rem; }
+    .wheel-wrap { width: min(82vw, 350px); }
+    .member-list { max-height: 360px; }
+    .program-members { grid-template-columns: 1fr; }
+  }
+</style>

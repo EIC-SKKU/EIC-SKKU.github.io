@@ -1,0 +1,88 @@
+---
+import "@fontsource-variable/inter";
+import "../styles/global.css";
+import Header from "../components/Header.astro";
+import Footer from "../components/Footer.astro";
+
+interface Props {
+  title?: string;
+  description?: string;
+  noindex?: boolean;
+}
+
+const {
+  title,
+  description = "EIC Lab at Sungkyunkwan University — research on efficient and intelligent computing across large language models, computer vision, design automation, and computer architecture.",
+  noindex = false,
+} = Astro.props;
+
+const pageTitle = title ? `${title} · EIC Lab` : "EIC Lab · SKKU";
+const canonical = Astro.site ? new URL(Astro.url.pathname, Astro.site) : undefined;
+const ogImage = Astro.site ? new URL("/og.png", Astro.site) : undefined;
+
+/* TEMP: keep the whole site out of search engines while news, publications,
+   and gallery still hold fictional placeholder content. Flip to false once
+   the real content is in. */
+const placeholderNoindex = true;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{pageTitle}</title>
+    <meta name="description" content={description} />
+    {(noindex || placeholderNoindex) && (
+      <meta name="robots" content="noindex, nofollow" />
+    )}
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    {canonical && <link rel="canonical" href={canonical} />}
+    <link
+      rel="alternate"
+      type="application/rss+xml"
+      title="EIC Lab — News"
+      href="/rss.xml"
+    />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content={pageTitle} />
+    <meta property="og:description" content={description} />
+    {canonical && <meta property="og:url" content={canonical} />}
+    {ogImage && <meta property="og:image" content={ogImage} />}
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="generator" content={Astro.generator} />
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to content</a>
+    <Header />
+    <main id="main">
+      <slot />
+    </main>
+    <Footer />
+  </body>
+</html>
+
+<script>
+  /* wires up every [data-open]/dialog pair on the page by aria-controls →
+     id, so a trigger and its dialog don't need to share a DOM ancestor —
+     used by member cards, the professor block, and publication pop-ups */
+  document
+    .querySelectorAll<HTMLElement>("[data-open][aria-controls]")
+    .forEach((trigger) => {
+      const dialog = document.getElementById(
+        trigger.getAttribute("aria-controls")!
+      );
+      if (dialog instanceof HTMLDialogElement) {
+        trigger.addEventListener("click", () => dialog.showModal());
+      }
+    });
+
+  document.querySelectorAll<HTMLDialogElement>("dialog").forEach((dialog) => {
+    dialog
+      .querySelector("[data-close]")
+      ?.addEventListener("click", () => dialog.close());
+    dialog.addEventListener("click", (event) => {
+      if (event.target === dialog) dialog.close();
+    });
+  });
+</script>

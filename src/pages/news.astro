@@ -1,0 +1,259 @@
+---
+import { getCollection, render } from "astro:content";
+import Base from "../layouts/Base.astro";
+import PageHeader from "../components/PageHeader.astro";
+
+const news = (await getCollection("news")).sort(
+  (a, b) => b.data.date.valueOf() - a.data.date.valueOf()
+);
+
+const posts = await Promise.all(
+  news.map(async (item) => ({
+    item,
+    Content: (await render(item)).Content,
+    hasBody: (item.body ?? "").trim().length > 0,
+  }))
+);
+
+const years = [...new Set(posts.map(({ item }) => item.data.date.getFullYear()))];
+
+const postsIn = (year: number) =>
+  posts.filter(({ item }) => item.data.date.getFullYear() === year);
+
+const fmtDay = (date: Date) =>
+  date.toLocaleDateString("en-US", { month: "short", day: "numeric" });
+---
+
+<Base title="News">
+  <PageHeader kicker="EIC Lab" title="News & Updates" />
+
+  <nav class="year-nav" aria-label="Jump to year">
+    <div class="container">
+      <ul>
+        {
+          years.map((year, i) => (
+            <li>
+              <a
+                href={`#year-${year}`}
+                data-year-link={year}
+                aria-current={i === 0 ? "true" : "false"}
+              >
+                {year}
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </nav>
+
+  <div class="container section">
+    <div class="timeline">
+      {
+        years.map((year) => (
+          <section class="year-group" aria-labelledby={`year-${year}`}>
+            <h2 id={`year-${year}`} class="year mono">
+              {year}
+            </h2>
+            <div class="entries">
+              {postsIn(year).map(({ item, Content, hasBody }) => (
+                <article class="entry" id={`post-${item.id}`}>
+                  <time
+                    class="entry-date mono"
+                    datetime={item.data.date.toISOString().slice(0, 10)}
+                  >
+                    {fmtDay(item.data.date)}
+                  </time>
+                  <div class="entry-body">
+                    <h3>{item.data.title}</h3>
+                    <div class="entry-text">
+                      {hasBody ? <Content /> : <p>{item.data.description}</p>}
+                    </div>
+                    {item.data.images.length > 0 && (
+                      <div class="entry-photos">
+                        {item.data.images.map((image, i) => (
+                          <img
+                            src={image}
+                            alt={`${item.data.title}, photo ${i + 1} of ${item.data.images.length}`}
+                            width="640"
+                            height="480"
+                            loading="lazy"
+                            decoding="async"
+                          />
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </article>
+              ))}
+            </div>
+          </section>
+        ))
+      }
+    </div>
+  </div>
+</Base>
+
+<style>
+  /* slim year bar that sticks just below the site header */
+  .year-nav {
+    position: sticky;
+    top: 72px;
+    z-index: 40;
+    background: rgba(255, 255, 255, 0.92);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border-bottom: 1px solid var(--line);
+  }
+
+  .year-nav ul {
+    display: flex;
+    gap: clamp(0.75rem, 3vw, 1.5rem);
+    overflow-x: auto;
+  }
+
+  .year-nav a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 46px;
+    padding: 0 0.2rem;
+    font-family: var(--mono);
+    font-size: 0.86rem;
+    font-weight: 550;
+    color: var(--ink-3);
+    border-bottom: 2px solid transparent;
+    transition: color 0.15s ease, border-color 0.15s ease;
+  }
+
+  .year-nav a:hover {
+    color: var(--ink);
+  }
+
+  .year-nav a[aria-current="true"] {
+    color: var(--accent-strong);
+    border-bottom-color: var(--accent);
+  }
+
+  .timeline {
+    max-width: 880px;
+    margin-inline: auto;
+  }
+
+  .year-group + .year-group {
+    margin-top: clamp(2.5rem, 5vw, 3.5rem);
+  }
+
+  /* anchor lands below the sticky header + year bar; scroll-margin has to
+     sit on the element the #hash actually targets (the heading / entry),
+     not their parent, or the browser scrolls it flush under the sticky bars */
+  .year {
+    scroll-margin-top: 135px;
+    font-size: 1.2rem;
+    font-weight: 650;
+    letter-spacing: 0.04em;
+    color: var(--accent);
+    padding-bottom: 0.7rem;
+    border-bottom: 2px solid var(--ink);
+  }
+
+  .entry {
+    display: grid;
+    grid-template-columns: 84px 1fr;
+    gap: 1.25rem;
+    padding-block: clamp(1.4rem, 3vw, 1.9rem);
+    scroll-margin-top: 135px;
+  }
+
+  .entry + .entry {
+    border-top: 1px solid var(--line);
+  }
+
+  .entry-date {
+    font-size: 0.8rem;
+    font-weight: 550;
+    color: var(--ink-3);
+    padding-top: 0.3rem;
+    white-space: nowrap;
+  }
+
+  .entry-body h3 {
+    font-size: 1.18rem;
+    font-weight: 650;
+    line-height: 1.35;
+  }
+
+  .entry-text {
+    margin-top: 0.55rem;
+    font-size: 0.95rem;
+    line-height: 1.65;
+    color: var(--ink-2);
+    max-width: 68ch;
+  }
+
+  .entry-text :global(p + p) {
+    margin-top: 0.6rem;
+  }
+
+  /* inline photo strip; scrolls sideways when there are many */
+  .entry-photos {
+    display: flex;
+    gap: 0.7rem;
+    margin-top: 1rem;
+    overflow-x: auto;
+    padding-bottom: 0.25rem;
+  }
+
+  .entry-photos img {
+    height: 150px;
+    width: auto;
+    flex: none;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--line);
+    object-fit: cover;
+  }
+
+  @media (max-width: 560px) {
+    .entry {
+      grid-template-columns: 1fr;
+      gap: 0.3rem;
+    }
+
+    .entry-date {
+      padding-top: 0;
+    }
+
+    .entry-photos img {
+      height: 120px;
+    }
+  }
+</style>
+
+<script>
+  /* highlight the year that's currently in view */
+  const links = new Map(
+    Array.from(
+      document.querySelectorAll<HTMLAnchorElement>("[data-year-link]")
+    ).map((link) => [`year-${link.dataset.yearLink}`, link])
+  );
+  const groups = document.querySelectorAll<HTMLElement>(".year-group");
+
+  const setCurrent = (id: string) => {
+    links.forEach((link, key) =>
+      link.setAttribute("aria-current", key === id ? "true" : "false")
+    );
+  };
+
+  const observer = new IntersectionObserver(
+    (entries) => {
+      // pick the topmost visible year group
+      const visible = entries
+        .filter((entry) => entry.isIntersecting)
+        .sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top);
+      const first = visible[0]?.target.querySelector("[id^='year-']");
+      if (first) setCurrent(first.id);
+    },
+    { rootMargin: "-130px 0px -55% 0px" }
+  );
+
+  groups.forEach((group) => observer.observe(group));
+</script>

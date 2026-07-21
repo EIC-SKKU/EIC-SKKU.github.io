@@ -1,0 +1,635 @@
+media:
+  - name: member_images
+    label: Member portraits
+    input: public/images/members
+    output: /images/members
+    extensions: [jpg, jpeg, png, webp, avif, svg]
+    categories: [image]
+    rename: safe
+  - name: gallery_images
+    label: Gallery images
+    input: public/images/gallery
+    output: /images/gallery
+    extensions: [jpg, jpeg, png, webp, avif, svg]
+    categories: [image]
+    rename: safe
+  - name: news_images
+    label: News images
+    input: public/images/news
+    output: /images/news
+    extensions: [jpg, jpeg, png, webp, avif, svg]
+    categories: [image]
+    rename: safe
+  - name: publication_images
+    label: Publication figures
+    input: public/images/publications
+    output: /images/publications
+    extensions: [jpg, jpeg, png, webp, avif, svg]
+    categories: [image]
+    rename: safe
+  - name: notes_images
+    label: Notes images
+    input: public/images/notes
+    output: /images/notes
+    extensions: [jpg, jpeg, png, webp, avif, svg]
+    categories: [image]
+    rename: safe
+
+components:
+  profile_links:
+    type: object
+    label: Profile links
+    fields:
+      - name: about
+        label: About page
+        type: string
+        description: Full URL or site path. Leave empty when unavailable.
+      - name: website
+        label: Personal website
+        type: string
+        description: Full URL including https://.
+      - name: scholar
+        label: Google Scholar
+        type: string
+        description: Full Google Scholar profile URL.
+      - name: orcid
+        label: ORCID
+        type: string
+        description: Full https://orcid.org/ URL.
+      - name: dblp
+        label: DBLP
+        type: string
+        description: Full DBLP profile URL.
+      - name: cv
+        label: CV
+        type: string
+        description: URL or site path to a CV (PDF).
+  publication_links:
+    type: object
+    label: Publication links
+    fields:
+      - name: paper
+        label: Paper
+        type: string
+        description: PDF, preprint, or publisher URL.
+      - name: code
+        label: Code
+        type: string
+        description: Source code repository URL.
+      - name: project
+        label: Project page
+        type: string
+        description: Project website URL.
+      - name: doi
+        label: DOI
+        type: string
+        description: Full https://doi.org/ URL.
+
+content:
+  - name: news
+    label: News & updates
+    type: collection
+    path: src/content/news
+    format: yaml-frontmatter
+    filename: "{date}-{title}.md"
+    subfolders: false
+    view:
+      fields: [title, date]
+      primary: title
+      sort: [date, title]
+      search: [title, description]
+      default:
+        sort: date
+        order: desc
+    fields:
+      - name: title
+        label: Headline
+        type: string
+        required: true
+        options:
+          maxlength: 120
+      - name: date
+        label: Publication date
+        type: date
+        required: true
+        options:
+          format: yyyy-MM-dd
+      - name: description
+        label: Summary
+        type: text
+        required: true
+        description: One or two sentences shown on the home page.
+        options:
+          minlength: 20
+          maxlength: 400
+      - name: images
+        label: News images
+        type: image
+        description: Optional images shown as a slideshow in the news pop-up.
+        options:
+          media: news_images
+          multiple:
+            max: 10
+          unique: true
+          categories: [image]
+          rename: safe
+      - name: body
+        label: Full story
+        type: rich-text
+        description: Optional article text shown in the news pop-up.
+        options:
+          format: markdown
+          media: news_images
+          rename: safe
+
+  - name: gallery
+    label: Photo gallery
+    type: collection
+    path: src/content/gallery
+    format: yaml-frontmatter
+    filename: "{date}-{title}.md"
+    subfolders: false
+    view:
+      fields: [image, title, category, date, featured]
+      primary: title
+      sort: [date, title, category]
+      search: [title, category]
+      default:
+        sort: date
+        order: desc
+    fields:
+      - name: title
+        label: Photo title
+        type: string
+        required: true
+        options:
+          maxlength: 120
+      - name: image
+        label: Main image
+        type: image
+        required: true
+        description: Cover photo shown in the gallery grid. Use a landscape 4:3 image for the cleanest crop.
+        options:
+          media: gallery_images
+          categories: [image]
+          rename: safe
+      - name: images
+        label: More photos (uploads)
+        type: image
+        description: Additional photos for this event, stored in the repo. Shown in the pop-up viewer.
+        options:
+          media: gallery_images
+          multiple:
+            max: 20
+          unique: true
+          categories: [image]
+          rename: safe
+      - name: imageLinks
+        label: More photos (external links)
+        type: string
+        list: true
+        description: "Paste full image URLs (https://...) hosted elsewhere — saves repo storage. Shown in the pop-up viewer."
+      - name: category
+        label: Category
+        type: select
+        required: true
+        options:
+          values:
+            - Conference
+            - Workshop
+            - Group Photo
+            - Lab Life
+            - Seminar
+            - Award
+            - Other
+      - name: date
+        label: Date
+        type: date
+        required: true
+        options:
+          format: yyyy-MM-dd
+      - name: featured
+        label: Feature on home page
+        type: boolean
+        default: false
+        description: Featured images appear in the home page carousel.
+
+  - name: members
+    label: Members
+    type: collection
+    path: src/content/members
+    format: yaml-frontmatter
+    filename:
+      template: "{name}.md"
+      field: create
+    subfolders: false
+    operations:
+      rename: false
+    view:
+      fields: [image, name, role, order]
+      primary: name
+      sort: [name, role, order]
+      search: [name, role, interests]
+      default:
+        sort: name
+        order: asc
+    fields:
+      - name: name
+        label: Full name
+        type: string
+        required: true
+        description: Display names may repeat. If they do, give the filename a short unique suffix when creating the member.
+        options:
+          maxlength: 100
+      - name: role
+        label: Role
+        type: select
+        required: true
+        options:
+          values:
+            - name: professor
+              label: Professor
+            - name: phd
+              label: Ph.D. student
+            - name: msphd
+              label: Integrated M.S.–Ph.D. student
+            - name: ms
+              label: M.S. student
+            - name: undergrad
+              label: Undergraduate researcher
+            - name: alumni
+              label: Alumni
+      - name: gameEligible
+        label: Include in member roulette
+        type: boolean
+        default: true
+        description: Controls whether this person appears on the private /game page. Alumni are always excluded.
+      - name: track
+        label: Program / track
+        type: string
+        description: "Optional note shown after the position, e.g. SSIT."
+        options:
+          maxlength: 40
+      - name: labLead
+        label: Current lab lead
+        type: boolean
+        default: false
+        description: Shows a lab lead badge on this person's member card. Should be true for exactly one person at a time.
+      - name: major
+        label: Major / department
+        type: string
+        description: "Shown in the About pop-up, e.g. Computer Science, Semiconductor Systems Engineering."
+        options:
+          maxlength: 100
+      - name: image
+        label: Portrait
+        type: image
+        description: Square portrait used on the Members page and Note author bylines. Alumni may leave this empty.
+        options:
+          media: member_images
+          categories: [image]
+          rename: safe
+      - name: interests
+        label: Research interests
+        type: text
+        description: A short comma-separated summary. Alumni may leave this empty.
+        options:
+          maxlength: 240
+      - name: currentResearch
+        label: Current research
+        type: text
+        description: Rough description of what they are working on right now, shown in the member pop-up.
+        options:
+          maxlength: 240
+      - name: email
+        label: Email
+        type: string
+        description: Optional public university email address.
+      - name: publications
+        label: Publications
+        type: string
+        list: true
+        description: "One entry per line, e.g. Title — Venue, Year. Shown in the member pop-up."
+      - name: links
+        component: profile_links
+      - name: formerPosition
+        label: Former position
+        type: string
+        description: Alumni only, for example M.S. Student (2023-2025).
+      - name: current
+        label: Current position
+        type: string
+        description: Alumni only, for example Engineer, Company - Division.
+      - name: order
+        label: Display order
+        type: number
+        required: true
+        default: 99
+        description: Lower numbers appear first within the same role.
+        options:
+          min: 1
+          max: 999
+      - name: body
+        label: Biography
+        type: rich-text
+        description: Used for the professor profile. Leave empty for other roles.
+        options:
+          format: markdown
+          media: false
+
+  - name: publications
+    label: Publications
+    type: collection
+    path: src/content/publications
+    format: yaml-frontmatter
+    filename: "{year}-{venueShort}-{title}.md"
+    subfolders: false
+    view:
+      fields: [year, order, title]
+      primary: title
+      sort: [year, order]
+      search: [title, authors, venue, venueShort]
+      default:
+        sort: year
+        order: desc
+    fields:
+      - name: title
+        label: Paper title
+        type: text
+        required: true
+        options:
+          maxlength: 300
+      - name: year
+        label: Year
+        type: select
+        required: true
+        options:
+          placeholder: Select a year
+          values: [2030, 2029, 2028, 2027, 2026, 2025, 2024, 2023, 2022, 2021, 2020, 2019, 2018, 2017, 2016, 2015, 2014, 2013, 2012, 2011, 2010]
+      - name: order
+        label: Order within year
+        type: number
+        required: true
+        default: 99
+        description: Lower numbers appear first within the selected year.
+        options:
+          min: 1
+          max: 999
+      - name: authors
+        label: Authors
+        type: text
+        required: true
+        description: Enter names in the exact order used by the paper.
+        options:
+          maxlength: 500
+      - name: venue
+        label: Venue
+        type: string
+        required: true
+        description: Full conference or journal name.
+        options:
+          maxlength: 220
+      - name: venueShort
+        label: Venue abbreviation
+        type: string
+        required: true
+        description: Short label such as DAC, NeurIPS, or TCAD.
+        options:
+          maxlength: 30
+      - name: venueType
+        label: Venue type
+        type: select
+        description: Groups the entry under Conference/Journal/Workshop on the publications page.
+        options:
+          values:
+            - name: conference
+              label: Conference
+            - name: journal
+              label: Journal
+            - name: workshop
+              label: Workshop
+      - name: preprint
+        label: Pre-print
+        type: boolean
+        default: false
+        description: Pre-prints are listed in their own section above the year groups.
+      - name: abstract
+        label: Abstract
+        type: text
+        description: Optional. Papers with an abstract get a clickable pop-up (title, authors, figure, abstract); papers without one stay plain text.
+        options:
+          maxlength: 1200
+      - name: image
+        label: Figure
+        type: image
+        description: Optional representative figure shown at the top of the pop-up.
+        options:
+          media: publication_images
+          categories: [image]
+          rename: safe
+      - name: area
+        label: Research area
+        type: select
+        description: Links the paper to its card on the research page.
+        options:
+          values:
+            - name: efficient-ai
+              label: Efficient AI
+            - name: eda
+              label: Electronic design automation
+            - name: arch
+              label: Computer architecture
+      - name: links
+        component: publication_links
+  - name: research
+    label: Research areas
+    type: collection
+    path: src/content/research
+    format: yaml-frontmatter
+    filename: "{title}.md"
+    subfolders: false
+    view:
+      fields: [title, icon, order]
+      primary: title
+      sort: [order, title]
+      search: [title, tagline]
+      default:
+        sort: order
+        order: asc
+    fields:
+      - name: title
+        label: Research area
+        type: string
+        required: true
+        options:
+          maxlength: 100
+      - name: icon
+        label: Icon
+        type: select
+        required: true
+        options:
+          values:
+            - name: llm
+              label: Large language model
+            - name: vision
+              label: Computer vision
+            - name: eda
+              label: Electronic design automation
+            - name: arch
+              label: Computer architecture
+      - name: tagline
+        label: Card summary
+        type: text
+        required: true
+        description: One sentence shown on research cards.
+        options:
+          maxlength: 220
+      - name: order
+        label: Display order
+        type: number
+        required: true
+        default: 99
+        options:
+          min: 1
+          max: 999
+      - name: body
+        label: Research description
+        type: rich-text
+        required: true
+        options:
+          format: markdown
+          media: false
+
+  - name: projects
+    label: Funded projects
+    type: collection
+    path: src/content/projects
+    format: yaml-frontmatter
+    filename: "{title}.md"
+    subfolders: false
+    view:
+      fields: [title, funder, period, order]
+      primary: title
+      sort: [order, title]
+      search: [title, funder]
+      default:
+        sort: order
+        order: asc
+    fields:
+      - name: title
+        label: Project title (과제명)
+        type: string
+        required: true
+        options:
+          maxlength: 200
+      - name: funder
+        label: Funding agency (지원기관)
+        type: string
+        required: true
+        description: "e.g. IITP (정보통신기획평가원), 한국연구재단 (NRF), 삼성전자"
+        options:
+          maxlength: 100
+      - name: period
+        label: Project period
+        type: string
+        required: true
+        description: "e.g. 2024.04 – 2027.12, or 2024.04 – Present"
+        options:
+          maxlength: 40
+      - name: order
+        label: Display order
+        type: number
+        required: true
+        default: 99
+        options:
+          min: 1
+          max: 999
+
+  - name: notes
+    label: Notes
+    type: collection
+    path: src/content/notes
+    format: yaml-frontmatter
+    filename: "{date}-{title}.md"
+    subfolders: false
+    view:
+      fields: [title, date, authors]
+      primary: title
+      sort: [date, title]
+      search: [title, summary, authors]
+      default:
+        sort: date
+        order: desc
+    fields:
+      - name: title
+        label: Title
+        type: string
+        required: true
+        options:
+          maxlength: 150
+      - name: date
+        label: Date
+        type: date
+        required: true
+        options:
+          format: yyyy-MM-dd
+      - name: summary
+        label: Summary
+        type: text
+        required: true
+        description: Short teaser shown on the notes list page.
+        options:
+          minlength: 20
+          maxlength: 300
+      - name: body
+        label: Post body
+        type: rich-text
+        required: true
+        description: Write visually in Editor mode, or switch to Source for Markdown. Use the image button to place photos between paragraphs.
+        options:
+          format: markdown
+          media: notes_images
+          rename: safe
+          switcher: true
+      - name: authors
+        label: Authors
+        type: reference
+        description: Select members in display order. Names may repeat; the role and unique member ID identify the right person.
+        options:
+          collection: members
+          multiple: true
+          search: "name,email,role,track"
+          value: "{name}"
+          label: "{primary} · {fields.role} · ID: {name}"
+      - name: category
+        label: Category
+        type: select
+        description: Loose grouping, shown as a tag on the list page.
+        options:
+          values:
+            - Event
+            - Paper Study
+            - Group Study
+            - Resources
+            - Reflection
+            - Other
+      - name: coverImage
+        label: Cover image
+        type: image
+        description: Shown on the list page and at the top of the post. Optional.
+        options:
+          media: notes_images
+          categories: [image]
+          rename: safe
+
+settings:
+  hide: true
+  content:
+    merge: true
+  commit:
+    identity: user
+    templates:
+      create: "content: add {path}"
+      update: "content: update {path}"
+      delete: "content: remove {path}"
+      rename: "content: rename {oldPath} to {newPath}"

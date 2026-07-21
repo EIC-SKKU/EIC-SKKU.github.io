@@ -1,0 +1,217 @@
+---
+import { getCollection } from "astro:content";
+import type { CollectionEntry } from "astro:content";
+import Base from "../layouts/Base.astro";
+import PageHeader from "../components/PageHeader.astro";
+import PublicationItem from "../components/PublicationItem.astro";
+import MemberDialog from "../components/MemberDialog.astro";
+import { ROLE_LABELS } from "../lib/roles";
+import {
+  buildMemberMaps,
+  isAuthorSeparator,
+  normalizeAuthorName,
+  splitAuthors,
+  type MatchedMember,
+} from "../lib/authors";
+
+const pubs = await getCollection("publications");
+const allMembers = await getCollection("members");
+const { membersByName, membersById } = buildMemberMaps(allMembers);
+
+/* preprints are pending publication — they live in a dedicated section on
+   top of the page instead of inside the year groups */
+const preprints = pubs
+  .filter((p) => p.data.preprint)
+  .sort((a, b) => b.data.year - a.data.year || a.data.order - b.data.order);
+
+const published = pubs.filter((p) => !p.data.preprint);
+
+const allYears = [...new Set(published.map((p) => p.data.year))].sort(
+  (a, b) => b - a
+);
+
+/* the most recent few years each get their own heading; older work is
+   bundled under one combined heading so the page doesn't turn into dozens
+   of tiny single-entry year sections */
+const RECENT_YEAR_COUNT = 4;
+const recentYears = allYears.slice(0, RECENT_YEAR_COUNT);
+const olderYears = allYears.slice(RECENT_YEAR_COUNT);
+
+const yearGroups = [
+  ...recentYears.map((year) => ({
+    id: String(year),
+    label: String(year),
+    years: [year],
+  })),
+  ...(olderYears.length > 0
+    ? [
+        {
+          id: "earlier",
+          label: `${Math.min(...olderYears)}~${Math.max(...olderYears)}`,
+          years: olderYears,
+        },
+      ]
+    : []),
+];
+
+const typeOf = (pub: CollectionEntry<"publications">) => {
+  if (pub.data.venueType) {
+    return pub.data.venueType[0].toUpperCase() + pub.data.venueType.slice(1);
+  }
+  // ponytail: fallback guess from venue text for entries without venueType
+  return /journal|transactions|magazine/i.test(pub.data.venue)
+    ? "Journal"
+    : "Conference";
+};
+
+const sections = ["Conference", "Workshop", "Journal"];
+
+const groupsFor = (years: number[]) => {
+  const inYears = published.filter((p) => years.includes(p.data.year));
+  return sections
+    .map((label) => ({
+      label,
+      items: inYears
+        .filter((p) => typeOf(p) === label)
+        .sort((a, b) => a.data.order - b.data.order),
+    }))
+    .filter((section) => section.items.length > 0);
+};
+
+/* every non-professor member referenced as an author anywhere on this page
+   gets exactly one pop-up rendered (deduplicated), which the citation
+   links/buttons in PublicationItem open in place — no page navigation */
+const matchedMemberIds = new Set(
+  pubs
+    .flatMap((p) => splitAuthors(p.data.authors))
+    .filter((part) => !isAuthorSeparator(part))
+    .map((part) => membersByName.get(normalizeAuthorName(part)))
+    .filter(
+      (m): m is MatchedMember => m !== undefined && m.role !== "professor"
+    )
+    .map((m) => m.id)
+);
+const popupMembers = [...matchedMemberIds]
+  .map((id) => membersById.get(id))
+  .filter((m): m is CollectionEntry<"members"> => m !== undefined);
+
+const hasMarkers = pubs.some((p) => /[*⁺]/.test(p.data.authors));
+---
+
+<Base title="Publications">
+  <PageHeader kicker="Publications" title="Publications" />
+
+  <div class="container section">
+    {hasMarkers && (
+      <p class="legend">* Equal contribution &nbsp; ⁺ Corresponding author</p>
+    )}
+    {
+      preprints.length > 0 && (
+        <section class="year-group" aria-labelledby="preprints">
+          <h2 id="preprints" class="year mono">
+            Preprints
+          </h2>
+          <div class="year-body">
+            <ul class="pub-list">
+              {preprints.map((pub) => (
+                <PublicationItem
+                  pub={pub}
+                  membersByName={membersByName}
+                  isPreprint
+                />
+              ))}
+            </ul>
+          </div>
+        </section>
+      )
+    }
+    {
+      yearGroups.map((group) => (
+        <section class="year-group" aria-labelledby={`year-${group.id}`}>
+          <h2 id={`year-${group.id}`} class="year mono">
+            {group.label}
+          </h2>
+          <div class="year-body">
+            {groupsFor(group.years).map((section) => (
+              <section class="type-group" aria-label={`${section.label}, ${group.label}`}>
+                <h3 class="type-label kicker">{section.label}</h3>
+                <ul class="pub-list">
+                  {section.items.map((pub) => (
+                    <PublicationItem pub={pub} membersByName={membersByName} />
+                  ))}
+                </ul>
+              </section>
+            ))}
+          </div>
+        </section>
+      ))
+    }
+  </div>
+
+  {
+    popupMembers.map((m) => (
+      <MemberDialog
+        dialogId={`member-dialog-${m.id}`}
+        name={m.data.name}
+        position={ROLE_LABELS[m.data.role] ?? m.data.role}
+        track={m.data.track}
+        major={m.data.major}
+        image={m.data.image}
+        interests={m.data.interests}
+        currentResearch={m.data.currentResearch}
+        publications={m.data.publications}
+        email={m.data.email}
+        links={m.data.links}
+      />
+    ))
+  }
+</Base>
+
+<style>
+  .year-group {
+    display: grid;
+    grid-template-columns: 110px 1fr;
+    gap: 1rem 2rem;
+    align-items: start;
+  }
+
+  .year-group + .year-group {
+    margin-top: 2rem;
+    padding-top: 2rem;
+    border-top: 1px solid var(--line);
+  }
+
+  .year {
+    font-size: 1.15rem;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    line-height: 1.4;
+  }
+
+  .year-body {
+    display: grid;
+    gap: 1.6rem;
+  }
+
+  .type-label {
+    margin-bottom: 0.75rem;
+  }
+
+  .pub-list {
+    display: grid;
+    gap: 1.35rem;
+  }
+
+  .legend {
+    margin-bottom: clamp(1.75rem, 3vw, 2.5rem);
+    font-size: 0.82rem;
+    color: var(--ink-3);
+  }
+
+  @media (max-width: 700px) {
+    .year-group {
+      grid-template-columns: 1fr;
+      gap: 0.9rem;
+    }
+  }
+</style>

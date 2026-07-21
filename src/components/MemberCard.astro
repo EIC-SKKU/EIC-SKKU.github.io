@@ -1,0 +1,389 @@
+---
+import MemberDialog from "./MemberDialog.astro";
+
+interface Props {
+  memberId: string;
+  name: string;
+  position: string;
+  track?: string;
+  major?: string;
+  labLead?: boolean;
+  image?: string;
+  interests?: string;
+  currentResearch?: string;
+  publications?: string[];
+  email?: string;
+  links?: {
+    about?: string;
+    website?: string;
+    scholar?: string;
+  };
+}
+
+const {
+  memberId,
+  name,
+  position,
+  track,
+  major,
+  labLead = false,
+  image,
+  interests,
+  currentResearch,
+  publications = [],
+  email,
+  links = {},
+} = Astro.props;
+
+const photo = image ?? "/images/members/placeholder.svg";
+const dialogId = `member-dialog-${memberId}`;
+const anchorId = `member-${memberId}`;
+
+const externalLinks = [
+  { label: "Website", href: links.website },
+  { label: "Scholar", href: links.scholar },
+].filter((item) => item.href);
+---
+
+<article class="member-card card" id={anchorId} data-member>
+  <div class="photo">
+    <img
+      src={photo}
+      alt={`Portrait of ${name}`}
+      width="400"
+      height="400"
+      loading="lazy"
+      decoding="async"
+    />
+    {
+      labLead && (
+        <span
+          class="lead-badge"
+          tabindex="0"
+          aria-label={`Lab lead — contact ${name.split(" ")[0]} for more lab info`}
+        >
+          <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+            <path d="M3 8l4 3 5-6 5 6 4-3-1.5 10h-15z" />
+          </svg>
+          <span class="lead-tip" aria-hidden="true">
+            <strong>Lab Lead</strong>
+            Contact {name.split(" ")[0]} for more lab info
+          </span>
+        </span>
+      )
+    }
+    <div class="photo-links" role="group" aria-label={`Actions for ${name}`}>
+      <button
+        class="link-pill"
+        type="button"
+        data-open
+        aria-haspopup="dialog"
+        aria-controls={dialogId}
+        aria-label={`About ${name}`}
+      >
+        About
+      </button>
+      {
+        externalLinks.map((item) => (
+          <a class="link-pill" href={item.href}>
+            {item.label}
+          </a>
+        ))
+      }
+    </div>
+  </div>
+  <div class="body">
+    <h3>
+      <!-- stretched button: clicking anywhere on the card opens the dialog -->
+      <button
+        class="open"
+        type="button"
+        data-open
+        aria-haspopup="dialog"
+        aria-controls={dialogId}
+      >
+        {name}
+      </button>
+    </h3>
+    <p class="position">{position}{track && ` · ${track}`}</p>
+    {interests && <p class="interests">{interests}</p>}
+    {email && <a class="email" href={`mailto:${email}`}>{email}</a>}
+  </div>
+
+  <MemberDialog
+    dialogId={dialogId}
+    name={name}
+    position={position}
+    track={track}
+    major={major}
+    image={photo}
+    interests={interests}
+    currentResearch={currentResearch}
+    publications={publications}
+    email={email}
+    links={links}
+  />
+</article>
+
+<style>
+  .member-card {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    transition: border-color 0.15s ease;
+    scroll-margin-top: 90px; /* clears the sticky site header when linked to */
+  }
+
+  .member-card:hover {
+    border-color: var(--accent-line);
+  }
+
+  .photo {
+    position: relative;
+    /* lets the link pills below react to the card's own width, not the
+       viewport — accurate regardless of how many grid columns are active */
+    container-type: inline-size;
+  }
+
+  .photo img {
+    width: 100%;
+    aspect-ratio: 1;
+    object-fit: cover;
+    transition: filter 0.2s ease;
+  }
+
+  .member-card:hover .photo > img,
+  .member-card:focus-within .photo > img {
+    filter: brightness(0.86);
+  }
+
+  /* crown badge marking the current lab lead, top corner of the photo */
+  .lead-badge {
+    position: absolute;
+    z-index: 2;
+    top: 0.6rem;
+    right: 0.6rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 30px;
+    height: 30px;
+    border-radius: 999px;
+    background: rgba(20, 24, 31, 0.55);
+    color: #f4c542;
+    backdrop-filter: blur(2px);
+    cursor: help;
+  }
+
+  .lead-badge svg {
+    width: 16px;
+    height: 16px;
+  }
+
+  /* two-line tooltip: bold "Lab Lead" title, name filled in below it —
+     stays correct whenever the lead changes since the name is data-driven */
+  .lead-tip {
+    position: absolute;
+    z-index: 3;
+    top: calc(100% + 0.5rem);
+    right: 0;
+    width: max-content;
+    max-width: 190px;
+    padding: 0.6rem 0.75rem;
+    border-radius: var(--radius-sm);
+    background: var(--ink);
+    color: #fff;
+    font-size: 0.78rem;
+    font-weight: 500;
+    line-height: 1.4;
+    text-align: left;
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(-4px);
+    transition: opacity 0.15s ease, transform 0.15s ease;
+  }
+
+  .lead-tip strong {
+    display: block;
+    margin-bottom: 0.2rem;
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+    color: #f4c542;
+  }
+
+  .lead-badge:hover .lead-tip,
+  .lead-badge:focus-visible .lead-tip {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* keep the pills clickable above the stretched name button */
+  .photo-links {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    padding: 0.7rem 0.85rem;
+    background: var(--surface);
+    border-bottom: 1px solid var(--line);
+  }
+
+  .link-pill {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.42rem 0.8rem;
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    font-size: 0.8rem;
+    font-weight: 550;
+    color: var(--ink-2);
+    background: var(--surface);
+    transition: border-color 0.15s ease, color 0.15s ease,
+      background-color 0.15s ease;
+  }
+
+  .link-pill:hover {
+    border-color: var(--accent-line);
+    background: var(--accent-tint);
+    color: var(--accent-strong);
+  }
+
+  /* card too narrow for About + Website + Scholar on one line — shrink
+     instead of letting them wrap to a second row */
+  @container (max-width: 260px) {
+    .photo-links {
+      gap: 0.25rem;
+      padding: 0.55rem 0.6rem;
+    }
+
+    .link-pill {
+      padding: 0.3rem 0.5rem;
+      font-size: 0.68rem;
+    }
+  }
+
+  /* On hover-capable devices, tuck the links into an overlay that
+     reveals on hover or keyboard focus. */
+  @media (hover: hover) and (pointer: fine) {
+    .photo-links {
+      position: absolute;
+      inset-inline: 0;
+      bottom: 0;
+      justify-content: center;
+      background: var(--scrim);
+      border-bottom: none;
+      opacity: 0;
+      transform: translateY(6px);
+      transition: opacity 0.18s ease, transform 0.18s ease;
+    }
+
+    .member-card:hover .photo-links,
+    .member-card:focus-within .photo-links {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .link-pill {
+      background: rgba(255, 255, 255, 0.12);
+      border-color: rgba(255, 255, 255, 0.35);
+      color: #fff;
+    }
+
+    .link-pill:hover {
+      background: #fff;
+      border-color: #fff;
+      color: var(--ink);
+    }
+  }
+
+  /* flex column with the email pinned to the bottom, so name / position /
+     interests / email share one left edge and line up across a card row */
+  .body {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 1rem 1.1rem 1.15rem;
+  }
+
+  h3 {
+    font-size: 1.15rem;
+  }
+
+  .open {
+    font: inherit;
+    letter-spacing: inherit;
+    text-align: left;
+    cursor: pointer;
+  }
+
+  /* stretch the name button over the whole card */
+  .open::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    cursor: pointer;
+  }
+
+  .member-card:hover .open {
+    color: var(--accent-strong);
+  }
+
+  .position {
+    margin-top: 0.2rem;
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--accent);
+  }
+
+  .interests {
+    margin-top: 0.5rem;
+    font-size: 0.88rem;
+    color: var(--ink-2);
+    line-height: 1.5;
+  }
+
+  /* guaranteed breathing room before the email pill, whichever paragraph
+     ends up right before it (interests, or position when interests is
+     absent) — keeps a minimum gap even when margin-top:auto below has no
+     leftover row space left to push through */
+  .body > p:has(+ .email) {
+    margin-bottom: 1rem;
+  }
+
+  /* pill button, matching the professor's link chips. margin-top:auto pins
+     it to the card's bottom edge, so every card in a grid row lines its
+     email pill up on the same straight line regardless of text length */
+  .email {
+    position: relative; /* keep clickable above the stretched button */
+    z-index: 1;
+    display: inline-flex;
+    align-items: center;
+    align-self: center;
+    margin-top: auto;
+    padding: 0.34rem 0.75rem;
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    background: var(--surface);
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    font-weight: 500;
+    color: var(--ink-2);
+    line-height: 1.2;
+    transition: border-color 0.15s ease, color 0.15s ease,
+      background-color 0.15s ease;
+  }
+
+  .email:hover {
+    border-color: var(--accent-line);
+    background: var(--accent-tint);
+    color: var(--accent-strong);
+  }
+</style>

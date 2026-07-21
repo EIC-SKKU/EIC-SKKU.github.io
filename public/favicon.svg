@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 1200 1200">
+  <rect width="1200" height="1200" rx="180" fill="#ffffff"/>
+  <g transform="translate(0 -110)">
+    <g fill="#00265F">
+      <rect x="150" y="470" width="330" height="100"/>
+      <rect x="150" y="660" width="330" height="100"/>
+      <rect x="150" y="850" width="330" height="100"/>
+      <rect x="540" y="470" width="120" height="100"/>
+    </g>
+    <g fill="#303438">
+      <rect x="540" y="610" width="120" height="340"/>
+      <rect x="720" y="470" width="330" height="100"/>
+      <rect x="720" y="470" width="100" height="480"/>
+      <rect x="720" y="850" width="330" height="100"/>
+    </g>
+  </g>
+</svg>

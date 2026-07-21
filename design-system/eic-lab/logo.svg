@@ -1,0 +1,63 @@
+<svg viewBox="0 0 1200 1200" xmlns="http://www.w3.org/2000/svg" font-family="'Segoe UI','Helvetica Neue',Arial,sans-serif">
+  <!-- EIC Lab logo - all elements aligned to one 900px column (x 150-1050), square canvas -->
+  <defs>
+    <style>
+      .navy { fill: #00265F; }
+      .dark { fill: #303438; }
+    </style>
+  </defs>
+  <rect width="1200" height="1200" fill="#FFFFFF"/>
+
+  <!-- ============ MONOGRAM  (x 150-1050, y 110-590) ============
+       E, i, C flush top and bottom; uniform 100 stroke;
+       E bars and C top/bottom bars share the same y positions -->
+  <!-- E -->
+  <rect class="navy" x="150" y="110" width="330" height="100"/>
+  <rect class="navy" x="150" y="300" width="330" height="100"/>
+  <rect class="navy" x="150" y="490" width="330" height="100"/>
+  <!-- i : dot aligned with E top bar, 40 gap, stem flush to bottom -->
+  <rect class="navy" x="540" y="110" width="120" height="100"/>
+  <rect class="dark" x="540" y="250" width="120" height="340"/>
+  <!-- C : same width as E, open right -->
+  <rect class="dark" x="720" y="110" width="330" height="100"/>
+  <rect class="dark" x="720" y="110" width="100" height="480"/>
+  <rect class="dark" x="720" y="490" width="330" height="100"/>
+
+  <!-- ============ WORDMARK "EICLab"  (x 150-1050, y 660-860) ============
+       stroke 40, cap height 200, x-height 160, letter gap 41 -->
+  <!-- E -->
+  <rect class="navy" x="150" y="660" width="40"  height="200"/>
+  <rect class="navy" x="150" y="660" width="140" height="40"/>
+  <rect class="navy" x="150" y="740" width="140" height="40"/>
+  <rect class="navy" x="150" y="820" width="140" height="40"/>
+  <!-- I -->
+  <rect class="navy" x="331" y="660" width="40" height="200"/>
+  <!-- C -->
+  <rect class="navy" x="412" y="660" width="40"  height="200"/>
+  <rect class="navy" x="412" y="660" width="140" height="40"/>
+  <rect class="navy" x="412" y="820" width="140" height="40"/>
+  <!-- L -->
+  <rect class="dark" x="593" y="660" width="40"  height="200"/>
+  <rect class="dark" x="593" y="820" width="125" height="40"/>
+  <!-- a : two-story pixel 'a' (top bar, right stem, left middle bar, lower-left stem, bottom bar) -->
+  <rect class="dark" x="759" y="700" width="125" height="40"/>
+  <rect class="dark" x="844" y="700" width="40"  height="160"/>
+  <rect class="dark" x="759" y="760" width="65"  height="40"/>
+  <rect class="dark" x="759" y="760" width="40"  height="100"/>
+  <rect class="dark" x="759" y="820" width="125" height="40"/>
+  <!-- b : full stem, gap, bowl -->
+  <rect class="dark" x="925"  y="660" width="40"  height="200"/>
+  <rect class="dark" x="985"  y="700" width="65"  height="40"/>
+  <rect class="dark" x="1010" y="700" width="40"  height="160"/>
+  <rect class="dark" x="925"  y="820" width="125" height="40"/>
+
+  <!-- ============ DIVIDER (x 150-1050, centered y 925) ============ -->
+  <rect class="navy" x="150" y="917" width="400" height="16"/>
+  <rect class="navy" x="580" y="905" width="40"  height="40"/>
+  <rect class="navy" x="650" y="917" width="400" height="16"/>
+
+  <!-- ============ TAGLINE ============ -->
+  <text x="600" y="1050" text-anchor="middle" font-size="60" font-weight="500"
+        textLength="900" lengthAdjust="spacingAndGlyphs"
+        fill="#303438">Efficient &amp; Intelligent Computing</text>
+</svg>

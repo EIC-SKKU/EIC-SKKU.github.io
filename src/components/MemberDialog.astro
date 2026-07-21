@@ -1,0 +1,270 @@
+---
+interface Props {
+  name: string;
+  position: string;
+  track?: string;
+  major?: string;
+  image?: string;
+  interests?: string;
+  currentResearch?: string;
+  publications?: string[];
+  email?: string;
+  links?: {
+    website?: string;
+    scholar?: string;
+  };
+  dialogId: string;
+}
+
+const {
+  name,
+  position,
+  track,
+  major,
+  image,
+  interests,
+  currentResearch,
+  publications = [],
+  email,
+  links = {},
+  dialogId,
+} = Astro.props;
+
+const photo = image ?? "/images/members/placeholder.svg";
+
+const externalLinks = [
+  { label: "Website", href: links.website },
+  { label: "Scholar", href: links.scholar },
+].filter((item) => item.href);
+---
+
+<dialog id={dialogId} class="member-dialog" aria-label={`About ${name}`}>
+  <div class="dialog-body">
+    <button class="close" type="button" data-close aria-label="Close">
+      <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true">
+        <path
+          d="M6 6l12 12M18 6L6 18"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"></path>
+      </svg>
+    </button>
+
+    <div class="dialog-head">
+      <img
+        class="dialog-photo"
+        src={photo}
+        alt=""
+        width="400"
+        height="400"
+        loading="lazy"
+        decoding="async"
+      />
+      <div class="dialog-title">
+        <h3>{name}</h3>
+        <p class="position">{position}{track && ` · ${track}`}</p>
+        {major && <p class="major">{major}</p>}
+      </div>
+    </div>
+
+    <div class="dialog-info">
+      {
+        currentResearch && (
+          <>
+            <p class="label">Current research</p>
+            <p class="value">{currentResearch}</p>
+          </>
+        )
+      }
+      {
+        interests && (
+          <>
+            <p class="label">Interests</p>
+            <p class="value">{interests}</p>
+          </>
+        )
+      }
+      {
+        publications.length > 0 && (
+          <>
+            <p class="label">Publications</p>
+            <ul class="pub-list">
+              {publications.map((pub) => (
+                <li>{pub}</li>
+              ))}
+            </ul>
+          </>
+        )
+      }
+      {
+        email && (
+          <>
+            <p class="label">Email</p>
+            <a class="email-link" href={`mailto:${email}`}>
+              {email}
+            </a>
+          </>
+        )
+      }
+
+      {
+        externalLinks.length > 0 && (
+          <div class="links">
+            {externalLinks.map((item) => (
+              <a class="chip" href={item.href}>
+                {item.label}
+              </a>
+            ))}
+          </div>
+        )
+      }
+    </div>
+  </div>
+</dialog>
+
+<style>
+  .member-dialog {
+    border: none;
+    padding: 0;
+    border-radius: var(--radius);
+    max-width: min(560px, calc(100vw - 2rem));
+    max-height: calc(100dvh - 2rem);
+    width: 100%;
+    overflow-y: auto;
+    box-shadow: 0 24px 60px rgb(15 20 30 / 0.25);
+  }
+
+  .member-dialog::backdrop {
+    background: rgba(20, 24, 31, 0.55);
+  }
+
+  .dialog-body {
+    position: relative;
+    padding: clamp(1.4rem, 3vw, 1.9rem);
+  }
+
+  /* compact avatar beside the name; content runs full-width below */
+  .dialog-head {
+    display: flex;
+    align-items: center;
+    gap: 1.15rem;
+    padding-bottom: 1.15rem;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .close {
+    position: absolute;
+    top: 0.7rem;
+    right: 0.7rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 38px;
+    height: 38px;
+    border-radius: 999px;
+    color: var(--ink-2);
+    background: var(--surface);
+    cursor: pointer;
+    transition: background-color 0.15s ease, color 0.15s ease;
+  }
+
+  .close:hover {
+    background: var(--surface-2);
+    color: var(--ink);
+  }
+
+  .dialog-photo {
+    width: 108px;
+    aspect-ratio: 1;
+    height: auto;
+    flex: none;
+    object-fit: cover;
+    border-radius: var(--radius-sm);
+  }
+
+  .dialog-title h3 {
+    font-size: 1.4rem;
+    padding-right: 2.25rem;
+  }
+
+  .position {
+    margin-top: 0.2rem;
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--accent);
+  }
+
+  .major {
+    margin-top: 0.3rem;
+    font-size: 0.85rem;
+    color: var(--ink-2);
+  }
+
+  .label {
+    margin-top: 1.05rem;
+    font-family: var(--mono);
+    font-size: 0.66rem;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--ink-3);
+  }
+
+  .value {
+    margin-top: 0.2rem;
+    font-size: 0.94rem;
+    line-height: 1.55;
+    color: var(--ink);
+  }
+
+  .email-link {
+    display: inline-block;
+    margin-top: 0.2rem;
+    font-family: var(--mono);
+    font-size: 0.82rem;
+    color: var(--accent);
+  }
+
+  .email-link:hover {
+    color: var(--accent-strong);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+
+  .pub-list {
+    margin-top: 0.3rem;
+    display: grid;
+    gap: 0.4rem;
+  }
+
+  .pub-list li {
+    position: relative;
+    padding-left: 1em;
+    font-size: 0.88rem;
+    line-height: 1.5;
+    color: var(--ink-2);
+  }
+
+  .pub-list li::before {
+    content: "–";
+    position: absolute;
+    left: 0;
+    color: var(--ink-3);
+  }
+
+  .links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.45rem;
+    margin-top: 1.1rem;
+  }
+
+  @media (max-width: 520px) {
+    .dialog-photo {
+      width: 84px;
+    }
+  }
+</style>

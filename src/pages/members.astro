@@ -1,0 +1,312 @@
+---
+import { getCollection, render } from "astro:content";
+import Base from "../layouts/Base.astro";
+import PageHeader from "../components/PageHeader.astro";
+import MemberCard from "../components/MemberCard.astro";
+import { ROLE_LABELS } from "../lib/roles";
+
+const members = await getCollection("members");
+const byRole = (role: string) =>
+  members
+    .filter((m) => m.data.role === role)
+    .sort((a, b) => a.data.order - b.data.order);
+
+const professor = byRole("professor")[0];
+const ProfessorBio = professor ? (await render(professor)).Content : null;
+
+// Only sections that actually have members are rendered.
+const sections = [
+  { role: "phd", title: "Ph.D. Students" },
+  { role: "msphd", title: "Integrated M.S.–Ph.D. Students" },
+  { role: "ms", title: "M.S. Students" },
+  { role: "undergrad", title: "Undergraduate Researchers" },
+].filter((section) => byRole(section.role).length > 0);
+
+const alumni = byRole("alumni");
+---
+
+<Base title="Members">
+  <PageHeader kicker="People" title="Members" />
+
+  <div class="container">
+    <!-- Professor -->
+    {
+      professor && ProfessorBio && (
+        <section class="member-section" aria-labelledby="sec-professor">
+          <h2 id="sec-professor" class="section-title">
+            Professor
+          </h2>
+
+          <article class="prof card" id={`member-${professor.id}`}>
+            <img
+              class="prof-photo"
+              src={professor.data.image}
+              alt={`Portrait of ${professor.data.name}`}
+              width="400"
+              height="400"
+              loading="eager"
+              decoding="async"
+            />
+            <div class="prof-body">
+              <h3>{professor.data.name}</h3>
+              <p class="prof-role">Professor</p>
+              {professor.data.major && (
+                <p class="prof-major">{professor.data.major}</p>
+              )}
+              <div class="prof-bio">
+                <ProfessorBio />
+              </div>
+              <div class="prof-links">
+                {professor.data.email && (
+                  <a class="chip" href={`mailto:${professor.data.email}`}>
+                    {professor.data.email}
+                  </a>
+                )}
+                {[
+                  ["Google Scholar", professor.data.links.scholar],
+                  ["Website", professor.data.links.website],
+                ]
+                  .filter(([, href]) => href)
+                  .map(([label, href]) => (
+                    <a class="chip" href={href}>
+                      {label}
+                    </a>
+                  ))}
+              </div>
+            </div>
+          </article>
+        </section>
+      )
+    }
+
+    <!-- Students -->
+    {
+      sections.map((section) => (
+        <section class="member-section" aria-labelledby={`sec-${section.role}`}>
+          <h2 id={`sec-${section.role}`} class="section-title">
+            {section.title}
+            <span class="count">{byRole(section.role).length}</span>
+          </h2>
+          <div class="member-grid">
+            {byRole(section.role).map((member) => (
+              <MemberCard
+                memberId={member.id}
+                name={member.data.name}
+                position={ROLE_LABELS[section.role] ?? section.role}
+                track={member.data.track}
+                major={member.data.major}
+                labLead={member.data.labLead}
+                image={member.data.image}
+                interests={member.data.interests}
+                currentResearch={member.data.currentResearch}
+                publications={member.data.publications}
+                email={member.data.email}
+                links={member.data.links}
+              />
+            ))}
+          </div>
+        </section>
+      ))
+    }
+
+    <!-- Alumni -->
+    {
+      alumni.length > 0 && (
+        <section class="member-section" aria-labelledby="sec-alumni">
+          <h2 id="sec-alumni" class="section-title">
+            Alumni
+          </h2>
+          <ul class="alumni-list card">
+            {alumni.map((person) => (
+              <li class="alumni-row">
+                <span class="alumni-name">{person.data.name}</span>
+                <span class="alumni-former">{person.data.formerPosition}</span>
+                <span class="alumni-current">
+                  <svg
+                    width="14"
+                    height="14"
+                    viewBox="0 0 24 24"
+                    aria-hidden="true"
+                    class="arrow"
+                  >
+                    <path
+                      d="M5 12h14m-6-6 6 6-6 6"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    />
+                  </svg>
+                  {person.data.current}
+                </span>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )
+    }
+
+  </div>
+</Base>
+
+<style>
+  .member-section {
+    padding-top: clamp(2.5rem, 5vw, 3.5rem);
+  }
+
+  .section-title {
+    display: flex;
+    align-items: baseline;
+    gap: 0.6rem;
+    font-size: clamp(1.45rem, 2.5vw, 1.8rem);
+    padding-bottom: 0.9rem;
+    margin-bottom: 1.5rem;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .count {
+    font-family: var(--sans);
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--accent-strong);
+    background: var(--accent-tint);
+    border: 1px solid var(--accent-line);
+    border-radius: 999px;
+    padding: 0.1rem 0.55rem;
+  }
+
+  /* ---- professor ---- */
+  .prof {
+    display: grid;
+    grid-template-columns: minmax(260px, 26%) 1fr;
+    overflow: hidden;
+    scroll-margin-top: 90px; /* clears the sticky site header when linked to */
+  }
+
+  /* photo fills its column edge-to-edge; the card's radius rounds the
+     outer corners and the text column starts at a straight line */
+  .prof-photo {
+    width: 100%;
+    height: 100%;
+    aspect-ratio: 1;
+    object-fit: cover;
+  }
+
+  .prof-body {
+    padding: clamp(1.4rem, 3vw, 2rem);
+    align-self: center;
+  }
+
+  .prof-body h3 {
+    font-size: 1.7rem;
+  }
+
+  .prof-role {
+    margin-top: 0.3rem;
+    font-size: 0.8rem;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--accent);
+  }
+
+  .prof-major {
+    margin-top: 0.25rem;
+    font-size: 0.85rem;
+    color: var(--ink-2);
+  }
+
+  .prof-bio {
+    margin-top: 0.9rem;
+    color: var(--ink-2);
+    font-size: 0.95rem;
+    max-width: 62ch;
+  }
+
+  .prof-bio :global(p + p) {
+    margin-top: 0.6rem;
+  }
+
+  .prof-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-top: 1.1rem;
+  }
+
+  /* ---- student grid ---- */
+  .member-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1.15rem;
+  }
+
+  /* ---- alumni ---- */
+  .alumni-list {
+    overflow: hidden;
+  }
+
+  .alumni-row {
+    display: grid;
+    grid-template-columns: 180px 1fr 1.4fr;
+    gap: 0.5rem 1.5rem;
+    align-items: baseline;
+    padding: 1.05rem 1.4rem;
+  }
+
+  .alumni-row + .alumni-row {
+    border-top: 1px solid var(--line);
+  }
+
+  .alumni-name {
+    font-size: 1rem;
+    font-weight: 640;
+  }
+
+  .alumni-former {
+    font-size: 0.9rem;
+    color: var(--ink-2);
+  }
+
+  .alumni-current {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    font-size: 0.9rem;
+    color: var(--ink-2);
+  }
+
+  .alumni-current .arrow {
+    color: var(--accent);
+    flex: none;
+  }
+
+  /* ---- responsive ---- */
+  @media (max-width: 1080px) {
+    .member-grid {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+
+  @media (max-width: 860px) {
+    .member-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+
+    .prof {
+      grid-template-columns: 1fr;
+    }
+
+    .alumni-row {
+      grid-template-columns: 1fr;
+      gap: 0.15rem;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .member-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

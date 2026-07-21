@@ -1,0 +1,33 @@
+---
+import Base from "../layouts/Base.astro";
+---
+
+<Base title="Content Manager" noindex>
+  <section class="admin container">
+    <h1>Content Manager</h1>
+    <a
+      class="btn btn-primary"
+      href="https://app.pagescms.org/"
+      target="_blank"
+      rel="noopener noreferrer"
+    >
+      Open Content Manager
+    </a>
+  </section>
+</Base>
+
+<style>
+  .admin {
+    min-height: 42vh;
+    display: grid;
+    place-content: center;
+    justify-items: center;
+    gap: 1.25rem;
+    padding-block: clamp(4rem, 10vw, 8rem);
+    text-align: center;
+  }
+
+  h1 {
+    font-size: clamp(1.8rem, 4vw, 2.4rem);
+  }
+</style>

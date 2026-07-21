@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://eic-skku.github.io/sitemap-index.xml

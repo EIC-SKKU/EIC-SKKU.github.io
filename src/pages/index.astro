@@ -1,0 +1,277 @@
+---
+import { getCollection } from "astro:content";
+import Base from "../layouts/Base.astro";
+import Carousel from "../components/Carousel.astro";
+
+const news = (await getCollection("news"))
+  .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf())
+  .slice(0, 4);
+
+const featured = (await getCollection("gallery", ({ data }) => data.featured))
+  .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
+
+const recentPubs = (await getCollection("publications"))
+  .sort((a, b) => b.data.year - a.data.year || a.data.order - b.data.order)
+  .slice(0, 3);
+
+const fmt = (date: Date) =>
+  date.toLocaleDateString("en-US", {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+  });
+
+const slides = featured.map((item) => ({
+  title: item.data.title,
+  image: item.data.image,
+  meta: fmt(item.data.date),
+}));
+---
+
+<Base>
+  <section class="container home">
+    <header class="identity">
+      <h1>Efficient &amp; Intelligent Computing Lab</h1>
+    </header>
+
+    <div class="main-grid">
+      <!-- heading sits in its own grid row so the carousel top aligns
+           with the news list, not the heading -->
+      <div class="col-head news-head">
+        <h2 id="news-heading">News &amp; Updates</h2>
+        <a class="head-link" href="/news/">All news →</a>
+      </div>
+      <ul class="news-list" aria-labelledby="news-heading">
+          {
+            news.map((item) => (
+              <li class="news-item">
+                <time
+                  class="mono"
+                  datetime={item.data.date.toISOString().slice(0, 10)}
+                >
+                  {fmt(item.data.date)}
+                </time>
+                <div>
+                  <h3>{item.data.title}</h3>
+                  <p>{item.data.description}</p>
+                </div>
+              </li>
+            ))
+          }
+      </ul>
+
+      <div class="carousel-col">
+        <Carousel slides={slides} label="Featured photos from the gallery" />
+      </div>
+    </div>
+
+    <section class="recent-pubs" aria-labelledby="pubs-heading">
+      <div class="col-head">
+        <h2 id="pubs-heading">Recent Publications</h2>
+        <a class="head-link" href="/publications/">All publications →</a>
+      </div>
+      <ul class="home-pub-list">
+        {
+          recentPubs.map((pub) => (
+            <li class="home-pub">
+              <p>
+                <span class="pub-authors">{pub.data.authors}.</span>{" "}
+                <span class="pub-title">“{pub.data.title}.”</span>{" "}
+                <span class="pub-venue">
+                  {pub.data.venue}, {pub.data.year}.
+                </span>
+                {pub.data.venueShort && (
+                  <span
+                    class:list={["pub-tag", "mono", { arxiv: pub.data.preprint }]}
+                  >
+                    {pub.data.venueShort}
+                  </span>
+                )}
+              </p>
+            </li>
+          ))
+        }
+      </ul>
+    </section>
+  </section>
+</Base>
+
+<style>
+  .home {
+    padding-block: clamp(3rem, 6vw, 5rem);
+  }
+
+  /* ---- identity line ---- */
+  .identity {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.7rem 1.5rem;
+    padding-bottom: clamp(2rem, 4vw, 3rem);
+    margin-bottom: clamp(2rem, 4vw, 3rem);
+    border-bottom: 1px solid var(--line);
+  }
+
+  .identity h1 {
+    font-size: clamp(1.6rem, 3.2vw, 2.1rem);
+    font-weight: 650;
+  }
+
+  /* ---- news + carousel ---- */
+  .main-grid {
+    display: grid;
+    grid-template-columns: 1.05fr 1fr;
+    grid-template-rows: auto 1fr;
+    column-gap: clamp(2rem, 4vw, 3.5rem);
+    align-items: start;
+  }
+
+  .news-head,
+  .news-list {
+    grid-column: 1;
+  }
+
+  .carousel-col {
+    grid-column: 2;
+    grid-row: 2;
+  }
+
+  .col-head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 1rem;
+  }
+
+  .col-head h2 {
+    font-size: clamp(1.35rem, 2.4vw, 1.65rem);
+    font-weight: 660;
+    line-height: 1.2;
+  }
+
+  .head-link {
+    font-size: 0.88rem;
+    font-weight: 550;
+    color: var(--ink-2);
+    white-space: nowrap;
+  }
+
+  .head-link:hover {
+    color: var(--accent-strong);
+  }
+
+  .news-list {
+    display: grid;
+  }
+
+  .news-item {
+    display: grid;
+    grid-template-columns: 108px 1fr;
+    gap: 1rem;
+    padding-block: 1.4rem;
+    border-top: 1px solid var(--line);
+  }
+
+  .news-item time {
+    font-size: 0.78rem;
+    color: var(--ink-3);
+    padding-top: 0.25rem;
+  }
+
+  .news-item h3 {
+    font-size: 1.05rem;
+    font-weight: 620;
+    letter-spacing: 0;
+    line-height: 1.4;
+  }
+
+  .news-item p {
+    margin-top: 0.3rem;
+    font-size: 0.9rem;
+    color: var(--ink-2);
+  }
+
+  /* ---- recent publications ---- */
+  .recent-pubs {
+    margin-top: clamp(2.5rem, 5vw, 3.5rem);
+    padding-top: clamp(1.5rem, 3vw, 2rem);
+    border-top: 1px solid var(--line);
+  }
+
+  .home-pub-list {
+    display: grid;
+  }
+
+  .home-pub {
+    padding-block: 0.95rem;
+  }
+
+  .home-pub + .home-pub {
+    border-top: 1px solid var(--line);
+  }
+
+  .home-pub p {
+    font-size: 0.93rem;
+    line-height: 1.6;
+    color: var(--ink-2);
+  }
+
+  .pub-title {
+    font-weight: 620;
+    color: var(--ink);
+  }
+
+  .pub-venue {
+    font-style: italic;
+  }
+
+  .pub-tag {
+    display: inline-block;
+    margin-left: 0.5rem;
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    font-style: normal;
+    color: var(--accent-strong);
+    background: var(--accent-tint);
+    border: 1px solid var(--accent-line);
+    border-radius: 4px;
+    padding: 0.06rem 0.4rem;
+    white-space: nowrap;
+    vertical-align: 0.08em;
+  }
+
+  /* arXiv preprints in red, matching the publications page */
+  .pub-tag.arxiv {
+    color: #9c1c1c;
+    background: #fdf0ef;
+    border-color: #efd0cd;
+  }
+
+  @media (max-width: 860px) {
+    .main-grid {
+      grid-template-columns: 1fr;
+      grid-template-rows: none;
+    }
+
+    .carousel-col {
+      grid-column: 1;
+      grid-row: auto;
+      margin-top: 2rem;
+    }
+  }
+
+  @media (max-width: 560px) {
+    .identity {
+      align-items: flex-start;
+      flex-direction: column;
+    }
+
+    .news-item {
+      grid-template-columns: 1fr;
+      gap: 0.2rem;
+    }
+  }
+</style>

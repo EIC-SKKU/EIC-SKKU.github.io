@@ -1,0 +1,539 @@
+---
+import { getCollection } from "astro:content";
+import Base from "../layouts/Base.astro";
+import PageHeader from "../components/PageHeader.astro";
+
+const items = (await getCollection("gallery")).sort(
+  (a, b) => b.data.date.valueOf() - a.data.date.valueOf()
+);
+
+const categories = [...new Set(items.map((item) => item.data.category))];
+
+const fmt = (date: Date) =>
+  date.toLocaleDateString("en-US", {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+  });
+
+/* all photos of an event: cover first, then uploads, then external links */
+const photosOf = (item: (typeof items)[number]) => [
+  item.data.image,
+  ...item.data.images,
+  ...item.data.imageLinks,
+];
+---
+
+<Base title="Gallery">
+  <PageHeader kicker="Gallery" title="Life at EIC Lab" />
+
+  <div class="container section">
+    <div class="filters" role="group" aria-label="Filter photos by category">
+      <button class="filter chip" type="button" data-filter="all" aria-pressed="true">
+        All
+      </button>
+      {
+        categories.map((category) => (
+          <button
+            class="filter chip"
+            type="button"
+            data-filter={category}
+            aria-pressed="false"
+          >
+            {category}
+          </button>
+        ))
+      }
+    </div>
+
+    <div class="gallery-grid" data-gallery>
+      {
+        items.map((item) => {
+          const photos = photosOf(item);
+          return (
+            <figure
+              class="item card"
+              data-category={item.data.category}
+              data-item
+              data-photos={JSON.stringify(photos)}
+              data-title={item.data.title}
+            >
+              <button
+                class="item-open"
+                type="button"
+                data-open
+                aria-haspopup="dialog"
+                aria-label={`View photos: ${item.data.title}`}
+              >
+                <img
+                  src={item.data.image}
+                  alt={item.data.title}
+                  width="800"
+                  height="600"
+                  loading="lazy"
+                  decoding="async"
+                />
+                <figcaption>
+                  <span class="title">{item.data.title}</span>
+                  <span class="meta">
+                    <time datetime={item.data.date.toISOString().slice(0, 10)}>
+                      {fmt(item.data.date)}
+                    </time>
+                    · {item.data.category}
+                    {photos.length > 1 && (
+                      <span class="count mono">{photos.length} photos</span>
+                    )}
+                    {item.data.featured && <span class="featured">Featured</span>}
+                  </span>
+                </figcaption>
+              </button>
+
+              <dialog class="lightbox" aria-label={`Photos: ${item.data.title}`}>
+                <div class="lb-body">
+                  <button class="lb-close" type="button" data-close aria-label="Close">
+                    <svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true">
+                      <path
+                        d="M6 6l12 12M18 6L6 18"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                      />
+                    </svg>
+                  </button>
+
+                  <div class="lb-stage">
+                    {photos.length > 1 && (
+                      <button
+                        class="lb-arrow lb-prev"
+                        type="button"
+                        data-prev
+                        aria-label="Previous photo"
+                      >
+                        <svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true">
+                          <path
+                            d="M15 5l-7 7 7 7"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2.2"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                          />
+                        </svg>
+                      </button>
+                    )}
+                    <img data-lb-img src={item.data.image} alt={item.data.title} />
+                    {photos.length > 1 && (
+                      <button
+                        class="lb-arrow lb-next"
+                        type="button"
+                        data-next
+                        aria-label="Next photo"
+                      >
+                        <svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true">
+                          <path
+                            d="M9 5l7 7-7 7"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2.2"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                          />
+                        </svg>
+                      </button>
+                    )}
+                  </div>
+
+                  <div class="lb-bar">
+                    <p class="lb-caption">
+                      <span class="lb-title">{item.data.title}</span>
+                      <span class="lb-meta">
+                        {fmt(item.data.date)} · {item.data.category}
+                      </span>
+                    </p>
+                    {photos.length > 1 && (
+                      <span class="lb-counter mono" data-counter>
+                        1 / {photos.length}
+                      </span>
+                    )}
+                  </div>
+
+                  {photos.length > 1 && (
+                    <div class="lb-thumbs">
+                      {photos.map((photo, i) => (
+                        <button
+                          class="lb-thumb"
+                          type="button"
+                          data-thumb={i}
+                          aria-label={`Photo ${i + 1} of ${photos.length}`}
+                          aria-current={i === 0 ? "true" : "false"}
+                        >
+                          <img
+                            src={photo}
+                            alt=""
+                            width="120"
+                            height="120"
+                            loading="lazy"
+                            decoding="async"
+                          />
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </dialog>
+            </figure>
+          );
+        })
+      }
+    </div>
+  </div>
+</Base>
+
+<style>
+  .filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-bottom: 1.75rem;
+  }
+
+  .filter {
+    cursor: pointer;
+    min-height: 40px;
+    padding-inline: 1rem;
+  }
+
+  .filter:hover {
+    border-color: var(--accent-line);
+    color: var(--accent-strong);
+  }
+
+  .filter[aria-pressed="true"] {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #fff;
+  }
+
+  .gallery-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.15rem;
+  }
+
+  .item {
+    margin: 0;
+    overflow: hidden;
+    transition: border-color 0.15s ease;
+  }
+
+  .item:hover {
+    border-color: var(--accent-line);
+  }
+
+  .item[hidden] {
+    display: none;
+  }
+
+  .item-open {
+    display: block;
+    width: 100%;
+    text-align: left;
+    cursor: zoom-in;
+  }
+
+  .item-open > img {
+    width: 100%;
+    aspect-ratio: 4 / 3;
+    object-fit: cover;
+    transition: filter 0.2s ease;
+  }
+
+  .item:hover .item-open > img {
+    filter: brightness(0.92);
+  }
+
+  figcaption {
+    padding: 0.85rem 1rem 1rem;
+  }
+
+  .title {
+    display: block;
+    font-size: 0.95rem;
+    font-weight: 620;
+  }
+
+  .meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.35rem;
+    margin-top: 0.3rem;
+    font-size: 0.8rem;
+    color: var(--ink-3);
+  }
+
+  .count {
+    font-size: 0.72rem;
+    color: var(--ink-2);
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    padding: 0.05rem 0.5rem;
+  }
+
+  .featured {
+    color: var(--accent-strong);
+    background: var(--accent-tint);
+    border: 1px solid var(--accent-line);
+    border-radius: 999px;
+    padding: 0.05rem 0.5rem;
+    font-size: 0.72rem;
+    font-weight: 600;
+  }
+
+  /* ---- lightbox ---- */
+  .lightbox {
+    border: none;
+    padding: 0;
+    background: transparent;
+    max-width: min(1040px, calc(100vw - 2rem));
+    width: 100%;
+  }
+
+  .lightbox::backdrop {
+    background: rgba(12, 15, 20, 0.82);
+  }
+
+  .lb-body {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    border-radius: var(--radius);
+    overflow: hidden;
+    background: var(--surface);
+    box-shadow: 0 24px 60px rgb(0 0 0 / 0.35);
+  }
+
+  .lb-stage {
+    position: relative;
+    display: grid;
+    place-items: center;
+    background: #101216;
+  }
+
+  .lb-stage > img {
+    max-width: 100%;
+    max-height: min(66vh, 620px);
+    width: auto;
+    height: auto;
+    object-fit: contain;
+  }
+
+  /* arrows overlay the image, clearly visible on the dark stage */
+  .lb-arrow {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 1;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 46px;
+    height: 46px;
+    border-radius: 999px;
+    color: #fff;
+    background: rgba(0, 0, 0, 0.5);
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    cursor: pointer;
+    transition: background-color 0.15s ease;
+  }
+
+  .lb-arrow:hover {
+    background: rgba(0, 0, 0, 0.8);
+  }
+
+  .lb-prev {
+    left: 0.85rem;
+  }
+
+  .lb-next {
+    right: 0.85rem;
+  }
+
+  .lb-close {
+    position: absolute;
+    top: 0.7rem;
+    right: 0.7rem;
+    z-index: 1;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 42px;
+    height: 42px;
+    border-radius: 999px;
+    color: #fff;
+    background: rgba(0, 0, 0, 0.45);
+    cursor: pointer;
+    transition: background-color 0.15s ease;
+  }
+
+  .lb-close:hover {
+    background: rgba(0, 0, 0, 0.7);
+  }
+
+  .lb-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0.85rem 1.1rem;
+  }
+
+  .lb-title {
+    display: block;
+    font-size: 0.98rem;
+    font-weight: 640;
+  }
+
+  .lb-meta {
+    display: block;
+    margin-top: 0.15rem;
+    font-size: 0.8rem;
+    color: var(--ink-3);
+  }
+
+  .lb-counter {
+    flex: none;
+    font-size: 0.8rem;
+    color: var(--ink-2);
+  }
+
+  /* thumbnail strip: every photo of the event, active one highlighted */
+  .lb-thumbs {
+    display: flex;
+    gap: 0.5rem;
+    padding: 0 1.1rem 1rem;
+    overflow-x: auto;
+  }
+
+  .lb-thumb {
+    flex: none;
+    padding: 0;
+    border-radius: var(--radius-sm);
+    overflow: hidden;
+    border: 2px solid transparent;
+    opacity: 0.65;
+    cursor: pointer;
+    transition: opacity 0.15s ease, border-color 0.15s ease;
+  }
+
+  .lb-thumb:hover {
+    opacity: 1;
+  }
+
+  .lb-thumb[aria-current="true"] {
+    border-color: var(--accent);
+    opacity: 1;
+  }
+
+  .lb-thumb img {
+    width: 64px;
+    height: 64px;
+    object-fit: cover;
+    display: block;
+  }
+
+  @media (max-width: 980px) {
+    .gallery-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  @media (max-width: 520px) {
+    .gallery-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .lb-bar {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 0.6rem;
+    }
+  }
+</style>
+
+<script>
+  /* category filters */
+  const filters = document.querySelectorAll<HTMLButtonElement>("[data-filter]");
+  const items = document.querySelectorAll<HTMLElement>("[data-gallery] [data-category]");
+
+  filters.forEach((button) => {
+    button.addEventListener("click", () => {
+      const value = button.dataset.filter;
+
+      filters.forEach((other) =>
+        other.setAttribute("aria-pressed", other === button ? "true" : "false")
+      );
+
+      items.forEach((item) => {
+        const show = value === "all" || item.dataset.category === value;
+        item.toggleAttribute("hidden", !show);
+      });
+    });
+  });
+
+  /* lightbox: bigger view with prev/next across the event's photos */
+  document.querySelectorAll<HTMLElement>("[data-item]").forEach((item) => {
+    const dialog = item.querySelector("dialog");
+    const img = item.querySelector<HTMLImageElement>("[data-lb-img]");
+    if (!dialog || !img) return;
+
+    const photos: string[] = JSON.parse(item.dataset.photos ?? "[]");
+    const title = item.dataset.title ?? "";
+    const counter = item.querySelector<HTMLElement>("[data-counter]");
+    const thumbs = Array.from(
+      item.querySelectorAll<HTMLButtonElement>("[data-thumb]")
+    );
+    let index = 0;
+
+    const show = (i: number) => {
+      index = ((i % photos.length) + photos.length) % photos.length; // wrap
+      img.src = photos[index];
+      img.alt = `${title}, photo ${index + 1} of ${photos.length}`;
+      if (counter) counter.textContent = `${index + 1} / ${photos.length}`;
+      thumbs.forEach((thumb, j) => {
+        thumb.setAttribute("aria-current", j === index ? "true" : "false");
+        if (j === index)
+          thumb.scrollIntoView({ block: "nearest", inline: "nearest" });
+      });
+    };
+
+    thumbs.forEach((thumb, i) =>
+      thumb.addEventListener("click", () => show(i))
+    );
+
+    item.querySelector("[data-open]")?.addEventListener("click", () => {
+      show(0);
+      dialog.showModal();
+    });
+    item
+      .querySelector("[data-close]")
+      ?.addEventListener("click", () => dialog.close());
+    item
+      .querySelector("[data-prev]")
+      ?.addEventListener("click", () => show(index - 1));
+    item
+      .querySelector("[data-next]")
+      ?.addEventListener("click", () => show(index + 1));
+
+    dialog.addEventListener("keydown", (event) => {
+      if (photos.length < 2) return;
+      if (event.key === "ArrowLeft") show(index - 1);
+      if (event.key === "ArrowRight") show(index + 1);
+    });
+
+    // click on the backdrop closes (the body swallows inner clicks)
+    dialog.addEventListener("click", (event) => {
+      if (event.target === dialog) dialog.close();
+    });
+  });
+</script>

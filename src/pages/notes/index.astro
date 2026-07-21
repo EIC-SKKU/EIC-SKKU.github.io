@@ -1,0 +1,292 @@
+---
+import { getCollection } from "astro:content";
+import Base from "../../layouts/Base.astro";
+import PageHeader from "../../components/PageHeader.astro";
+import { ROLE_LABELS } from "../../lib/roles";
+import {
+  buildMemberMaps,
+  resolveAuthorReferences,
+} from "../../lib/authors";
+
+const posts = (await getCollection("notes")).sort(
+  (a, b) => b.data.date.valueOf() - a.data.date.valueOf()
+);
+const allMembers = await getCollection("members");
+const { membersByName, membersById, memberDisambiguation } = buildMemberMaps(allMembers);
+const postsWithAuthors = posts.map((post) => ({
+  post,
+  authors: resolveAuthorReferences(
+    post.data.authors,
+    membersByName,
+    membersById
+  ),
+}));
+
+const categories = [
+  ...new Set(posts.map((p) => p.data.category).filter(Boolean)),
+] as string[];
+
+const fmt = (date: Date) =>
+  date.toLocaleDateString("en-US", {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+  });
+---
+
+<Base title="Notes">
+  <PageHeader kicker="Notes" title="Lab Notes" />
+
+  <div class="container section">
+    {
+      posts.length === 0 ? (
+        <p class="empty">No posts yet.</p>
+      ) : (
+        <>
+          {categories.length > 1 && (
+            <div class="filters" role="group" aria-label="Filter notes by category">
+              <button class="filter chip" type="button" data-filter="all" aria-pressed="true">
+                All
+              </button>
+              {categories.map((category) => (
+                <button
+                  class="filter chip"
+                  type="button"
+                  data-filter={category}
+                  aria-pressed="false"
+                >
+                  {category}
+                </button>
+              ))}
+            </div>
+          )}
+
+          <ul class="post-list" data-notes>
+            {postsWithAuthors.map(({ post, authors }) => (
+              <li class="post card" data-category={post.data.category ?? ""}>
+                <a class="post-link" href={`/notes/${post.id}/`}>
+                  <img
+                    class="post-cover"
+                    src={post.data.coverImage ?? "/images/gallery/placeholder.svg"}
+                    alt=""
+                    width="800"
+                    height="500"
+                    loading="lazy"
+                    decoding="async"
+                  />
+                  <div class="post-body">
+                    <div class="post-meta">
+                      <time class="mono" datetime={post.data.date.toISOString().slice(0, 10)}>
+                        {fmt(post.data.date)}
+                      </time>
+                      {post.data.category && (
+                        <span class="category-tag mono">{post.data.category}</span>
+                      )}
+                    </div>
+                    <h2>{post.data.title}</h2>
+                    <p class="summary">{post.data.summary}</p>
+                    {authors.length > 0 && (
+                      <div class="authors" aria-label={`By ${authors.map((author) => author.name).join(", ")}`}>
+                        {authors.map((author) => (
+                          <span class="author">
+                            <img
+                              src={author.member?.image ?? "/images/members/placeholder.svg"}
+                              alt=""
+                              width="24"
+                              height="24"
+                              loading="lazy"
+                              decoding="async"
+                            />
+                            <span>
+                              {author.name}
+                              {author.member && memberDisambiguation.has(author.member.id) && (
+                                <small>
+                                  {" · "}{ROLE_LABELS[author.member.role] ?? author.member.role}
+                                  {memberDisambiguation.get(author.member.id)?.sameRoleOrdinal &&
+                                    ` #${memberDisambiguation.get(author.member.id)?.sameRoleOrdinal}`}
+                                </small>
+                              )}
+                            </span>
+                          </span>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </a>
+              </li>
+            ))}
+          </ul>
+        </>
+      )
+    }
+  </div>
+</Base>
+
+<style>
+  .empty {
+    color: var(--ink-2);
+  }
+
+  .filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-bottom: 1.75rem;
+  }
+
+  .filter {
+    cursor: pointer;
+    min-height: 40px;
+    padding-inline: 1rem;
+  }
+
+  .filter:hover {
+    border-color: var(--accent-line);
+    color: var(--accent-strong);
+  }
+
+  .filter[aria-pressed="true"] {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #fff;
+  }
+
+  .post-list {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.15rem;
+  }
+
+  .post {
+    overflow: hidden;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+  }
+
+  .post[hidden] {
+    display: none;
+  }
+
+  .post:hover {
+    border-color: var(--accent-line);
+    box-shadow: 0 14px 32px rgb(25 30 40 / 0.07);
+  }
+
+  .post-link {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+  }
+
+  .post-cover {
+    width: 100%;
+    aspect-ratio: 4 / 3;
+    object-fit: cover;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .post-body {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    padding: 1.1rem 1.2rem 1.3rem;
+  }
+
+  .post-meta {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    font-size: 0.76rem;
+    color: var(--ink-3);
+  }
+
+  .category-tag {
+    font-size: 0.66rem;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--accent-strong);
+    background: var(--accent-tint);
+    border: 1px solid var(--accent-line);
+    border-radius: 4px;
+    padding: 0.1rem 0.4rem;
+  }
+
+  .post-body h2 {
+    margin-top: 0.5rem;
+    font-size: 1.05rem;
+    line-height: 1.35;
+  }
+
+  .summary {
+    margin-top: 0.45rem;
+    font-size: 0.88rem;
+    line-height: 1.55;
+    color: var(--ink-2);
+  }
+
+  .authors {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem 0.65rem;
+    margin-top: auto;
+    padding-top: 0.8rem;
+    font-size: 0.8rem;
+    font-weight: 550;
+    color: var(--ink-3);
+  }
+
+  .author {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    min-width: 0;
+  }
+
+  .author img {
+    width: 24px;
+    height: 24px;
+    flex: none;
+    border: 1px solid var(--line);
+    border-radius: 50%;
+    object-fit: cover;
+    background: var(--surface-2);
+  }
+
+  .author small {
+    color: var(--ink-3);
+    font-size: 0.7rem;
+    font-weight: 500;
+  }
+
+  @media (max-width: 1000px) {
+    .post-list {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  @media (max-width: 640px) {
+    .post-list {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
+
+<script>
+  const filters = document.querySelectorAll<HTMLButtonElement>("[data-filter]");
+  const items = document.querySelectorAll<HTMLElement>("[data-notes] [data-category]");
+
+  filters.forEach((button) => {
+    button.addEventListener("click", () => {
+      const value = button.dataset.filter;
+
+      filters.forEach((other) =>
+        other.setAttribute("aria-pressed", other === button ? "true" : "false")
+      );
+
+      items.forEach((item) => {
+        const show = value === "all" || item.dataset.category === value;
+        item.toggleAttribute("hidden", !show);
+      });
+    });
+  });
+</script>

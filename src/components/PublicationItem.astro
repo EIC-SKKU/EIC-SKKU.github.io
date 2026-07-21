@@ -1,0 +1,464 @@
+---
+import type { CollectionEntry } from "astro:content";
+import {
+  isAuthorSeparator,
+  normalizeAuthorName,
+  splitAuthors,
+  type MatchedMember,
+} from "../lib/authors";
+
+interface Props {
+  pub: CollectionEntry<"publications">;
+  membersByName: Map<string, MatchedMember>;
+  isPreprint?: boolean;
+}
+
+const { pub, membersByName, isPreprint = false } = Astro.props;
+const d = pub.data;
+
+const matchMember = (part: string) =>
+  membersByName.get(normalizeAuthorName(part));
+
+const parts = splitAuthors(d.authors);
+
+const matchedAuthors = parts
+  .filter((part) => !isAuthorSeparator(part))
+  .map((part) => ({ name: part.trim(), match: matchMember(part) }))
+  .filter(
+    (x): x is { name: string; match: MatchedMember } => x.match !== undefined
+  );
+
+/* papers without an abstract stay plain text — only "selected" ones with
+   real content behind them become clickable */
+const hasDetails = Boolean(d.abstract);
+const dialogId = `pub-${pub.id}`;
+
+const linkLabels: Record<string, string> = {
+  paper: "Paper",
+  code: "Code",
+  project: "Project page",
+  doi: "DOI",
+};
+
+---
+
+<li class:list={["pub", { clickable: hasDetails }]} data-pub>
+  <p class="ref">
+    <span class="authors">
+      {
+        parts.map((part) => {
+          const m = matchMember(part);
+          if (!m) return part;
+          // professor has no pop-up on the Members page (her info is shown
+          // inline there already), so her name still links to the page;
+          // everyone else opens their existing member pop-up right here
+          return m.role === "professor" ? (
+            <a class="member-name" href={`/members/#member-${m.id}`}>
+              {part}
+            </a>
+          ) : (
+            <button
+              class="member-name member-name-btn"
+              type="button"
+              data-open
+              aria-haspopup="dialog"
+              aria-controls={`member-dialog-${m.id}`}
+            >
+              {part}
+            </button>
+          );
+        })
+      }.
+    </span>{" "}
+    {
+      hasDetails ? (
+        <button
+          class="title title-open"
+          type="button"
+          data-open
+          aria-haspopup="dialog"
+          aria-controls={dialogId}
+        >
+          “{d.title}.”
+        </button>
+      ) : (
+        <span class="title">“{d.title}.”</span>
+      )
+    }{" "}
+    <span class="venue">
+      {d.venue}, {d.year}.
+    </span>
+    {
+      d.venueShort && (
+        <span class:list={["venue-tag", "mono", { arxiv: isPreprint }]}>
+          {d.venueShort}
+        </span>
+      )
+    }
+  </p>
+  {
+    Object.values(d.links).some(Boolean) && (
+      <div class="pub-links">
+        {Object.entries(d.links)
+          .filter(([, href]) => href)
+          .map(([key, href]) => (
+            <a class="chip" href={href}>
+              {linkLabels[key] ?? key}
+            </a>
+          ))}
+      </div>
+    )
+  }
+
+  {
+    hasDetails && (
+      <dialog id={dialogId} class="pub-dialog" aria-label={d.title}>
+        <div class="pub-dialog-body">
+          <button class="close" type="button" data-close aria-label="Close">
+            <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true">
+              <path
+                d="M6 6l12 12M18 6L6 18"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+              />
+            </svg>
+          </button>
+
+          <div class="pub-dialog-scroll">
+            <p class="pub-dialog-venue mono">
+              {d.venue}, {d.year}
+              {d.venueShort && ` · ${d.venueShort}`}
+            </p>
+            <h3 class="pub-dialog-title">{d.title}</h3>
+            <p class="pub-dialog-authors">
+              {parts.map((part) => {
+                const m = matchMember(part);
+                if (!m) return part;
+                return m.role === "professor" ? (
+                  <a class="member-name" href={`/members/#member-${m.id}`}>
+                    {part}
+                  </a>
+                ) : (
+                  <button
+                    class="member-name member-name-btn"
+                    type="button"
+                    data-open
+                    aria-haspopup="dialog"
+                    aria-controls={`member-dialog-${m.id}`}
+                  >
+                    {part}
+                  </button>
+                );
+              })}
+            </p>
+
+            {matchedAuthors.length > 0 && (
+              <div class="author-avatars">
+                {matchedAuthors.map(({ name, match }) =>
+                  match.role === "professor" ? (
+                    <a
+                      class="author-avatar"
+                      href={`/members/#member-${match.id}`}
+                    >
+                      <img
+                        src={match.image ?? "/images/members/placeholder.svg"}
+                        alt=""
+                        width="40"
+                        height="40"
+                        loading="lazy"
+                        decoding="async"
+                      />
+                      <span>{name}</span>
+                    </a>
+                  ) : (
+                    <button
+                      class="author-avatar"
+                      type="button"
+                      data-open
+                      aria-haspopup="dialog"
+                      aria-controls={`member-dialog-${match.id}`}
+                    >
+                      <img
+                        src={match.image ?? "/images/members/placeholder.svg"}
+                        alt=""
+                        width="40"
+                        height="40"
+                        loading="lazy"
+                        decoding="async"
+                      />
+                      <span>{name}</span>
+                    </button>
+                  )
+                )}
+              </div>
+            )}
+
+            {d.image && (
+              <img
+                class="pub-dialog-image"
+                src={d.image}
+                alt=""
+                width="800"
+                height="500"
+                loading="lazy"
+                decoding="async"
+              />
+            )}
+
+            {d.abstract && (
+              <>
+                <p class="label">Abstract</p>
+                <p class="value">{d.abstract}</p>
+              </>
+            )}
+          </div>
+        </div>
+      </dialog>
+    )
+  }
+</li>
+
+<style>
+  .pub {
+    position: relative;
+    margin: -0.85rem -1rem;
+    padding: 0.85rem 1rem;
+    border-radius: var(--radius-sm);
+  }
+
+  /* the whole citation gets a soft highlight on hover — the affordance
+     lives on the block, not the title text, which stays plain */
+  .pub.clickable {
+    transition: background-color 0.15s ease;
+  }
+
+  .pub.clickable:hover {
+    background: var(--accent-tint);
+  }
+
+  .pub .ref {
+    font-size: 0.95rem;
+    line-height: 1.6;
+    color: var(--ink-2);
+  }
+
+  .authors {
+    color: var(--ink-2);
+  }
+
+  .member-name {
+    position: relative; /* keep clickable above the pub's stretched button */
+    z-index: 1;
+    font-weight: 640;
+    color: var(--ink);
+  }
+
+  /* reset the button-flavored variant back to plain inline text.
+     font:inherit resets font-weight too, so it's restored explicitly right
+     after — otherwise this silently overrides .member-name's bold */
+  .member-name-btn {
+    font: inherit;
+    font-weight: 640;
+    letter-spacing: inherit;
+    border: none;
+    background: none;
+    padding: 0;
+    cursor: pointer;
+  }
+
+  .member-name:hover {
+    color: var(--accent-strong);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+
+  .title {
+    font-weight: 620;
+    color: var(--ink);
+  }
+
+  /* same font:inherit-resets-weight trap as .member-name-btn above */
+  .title-open {
+    font: inherit;
+    font-weight: 620;
+    letter-spacing: inherit;
+    text-align: left;
+    cursor: pointer;
+  }
+
+  /* stretch the click target over the whole citation block */
+  .title-open::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    cursor: pointer;
+  }
+
+  .venue {
+    font-style: italic;
+  }
+
+  .venue-tag {
+    display: inline-block;
+    margin-left: 0.5rem;
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    font-style: normal;
+    color: var(--accent-strong);
+    background: var(--accent-tint);
+    border: 1px solid var(--accent-line);
+    border-radius: 4px;
+    padding: 0.06rem 0.4rem;
+    white-space: nowrap;
+    vertical-align: 0.08em;
+  }
+
+  /* arXiv preprints stand out from conference tags by color */
+  .venue-tag.arxiv {
+    color: #9c1c1c;
+    background: #fdf0ef;
+    border-color: #efd0cd;
+  }
+
+  .pub-links {
+    position: relative; /* keep clickable above the pub's stretched button */
+    z-index: 1;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-top: 0.6rem;
+  }
+
+  /* ---- pop-up: bigger than the member dialog, room for a figure ---- */
+  .pub-dialog {
+    border: none;
+    padding: 0;
+    border-radius: var(--radius);
+    max-width: min(720px, calc(100vw - 2rem));
+    max-height: calc(100dvh - 2rem);
+    width: 100%;
+    overflow: hidden;
+    box-shadow: 0 24px 60px rgb(15 20 30 / 0.25);
+  }
+
+  .pub-dialog::backdrop {
+    background: rgba(20, 24, 31, 0.55);
+  }
+
+  .pub-dialog-body {
+    position: relative;
+  }
+
+  .pub-dialog-scroll {
+    max-height: calc(100dvh - 2rem);
+    overflow-y: auto;
+    padding: clamp(1.5rem, 3vw, 2.25rem);
+  }
+
+  .close {
+    position: absolute;
+    z-index: 1;
+    top: 0.7rem;
+    right: 0.7rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 38px;
+    height: 38px;
+    border-radius: 999px;
+    color: var(--ink-2);
+    background: var(--surface);
+    cursor: pointer;
+    transition: background-color 0.15s ease, color 0.15s ease;
+  }
+
+  .close:hover {
+    background: var(--surface-2);
+    color: var(--ink);
+  }
+
+  .pub-dialog-venue {
+    font-size: 0.78rem;
+    color: var(--ink-3);
+  }
+
+  .pub-dialog-title {
+    margin-top: 0.4rem;
+    font-size: 1.35rem;
+    line-height: 1.35;
+  }
+
+  .pub-dialog-authors {
+    margin-top: 0.6rem;
+    font-size: 0.92rem;
+    line-height: 1.55;
+    color: var(--ink-2);
+  }
+
+  .author-avatars {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.6rem;
+    margin-top: 1rem;
+  }
+
+  .author-avatar {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    padding: 0.3rem 0.7rem 0.3rem 0.3rem;
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    font: inherit;
+    font-size: 0.82rem;
+    font-weight: 550;
+    color: var(--ink-2);
+    background: var(--surface);
+    cursor: pointer;
+    transition: border-color 0.15s ease, color 0.15s ease,
+      background-color 0.15s ease;
+  }
+
+  .author-avatar:hover {
+    border-color: var(--accent-line);
+    background: var(--accent-tint);
+    color: var(--accent-strong);
+  }
+
+  .author-avatar img {
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    object-fit: cover;
+    flex: none;
+  }
+
+  .pub-dialog-image {
+    display: block;
+    width: 100%;
+    aspect-ratio: 8 / 5;
+    object-fit: cover;
+    margin-top: 1.25rem;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--line);
+  }
+
+  .label {
+    margin-top: 1.25rem;
+    font-family: var(--mono);
+    font-size: 0.66rem;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--ink-3);
+  }
+
+  .value {
+    margin-top: 0.35rem;
+    font-size: 0.94rem;
+    line-height: 1.65;
+    color: var(--ink);
+  }
+</style>

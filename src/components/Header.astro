@@ -1,0 +1,313 @@
+---
+const nav = [
+  { href: "/", label: "Home" },
+  { href: "/members/", label: "Members" },
+  { href: "/research/", label: "Research" },
+  { href: "/news/", label: "News" },
+  { href: "/gallery/", label: "Gallery" },
+  { href: "/notes/", label: "Notes" },
+  { href: "/publications/", label: "Publications" },
+];
+
+const path = Astro.url.pathname;
+const isActive = (href: string) =>
+  href === "/" ? path === "/" : path.startsWith(href);
+---
+
+<header class="site-header" data-header>
+  <div class="container bar">
+    <a class="brand" href="/">
+      <!-- EIC monogram from design-system/eic-lab/logo.svg; explicit width so
+           mobile browsers that don't derive it from the viewBox don't collapse it -->
+      <svg
+        class="brand-mark"
+        width="49"
+        height="26"
+        viewBox="150 110 900 480"
+        aria-hidden="true"
+      >
+        <g fill="#00265f">
+          <rect x="150" y="110" width="330" height="100"></rect>
+          <rect x="150" y="300" width="330" height="100"></rect>
+          <rect x="150" y="490" width="330" height="100"></rect>
+          <rect x="540" y="110" width="120" height="100"></rect>
+        </g>
+        <g fill="#303438">
+          <rect x="540" y="250" width="120" height="340"></rect>
+          <rect x="720" y="110" width="330" height="100"></rect>
+          <rect x="720" y="110" width="100" height="480"></rect>
+          <rect x="720" y="490" width="330" height="100"></rect>
+        </g>
+      </svg>
+      <span class="brand-name">EIC Lab</span>
+      <span class="brand-divider" aria-hidden="true"></span>
+      <img
+        class="skku-mark"
+        src="/skku_logo_transparent.png"
+        alt=""
+        width="285"
+        height="285"
+      />
+      <span class="brand-uni">
+        <span class="uni-full">SKKU</span>
+        <span class="uni-short">SKKU</span>
+      </span>
+    </a>
+
+    <nav class="site-nav" id="site-nav" aria-label="Main">
+      <ul>
+        {
+          nav.map((item) => (
+            <li>
+              <a
+                href={item.href}
+                aria-current={isActive(item.href) ? "page" : undefined}
+              >
+                {item.label}
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </nav>
+
+    <button
+      class="nav-toggle"
+      type="button"
+      aria-expanded="false"
+      aria-controls="site-nav"
+      data-nav-toggle
+    >
+      <span class="visually-hidden">Menu</span>
+      <svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true">
+        <path
+          class="icon-open"
+          d="M4 7h16M4 12h16M4 17h16"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"></path>
+        <path
+          class="icon-close"
+          d="M6 6l12 12M18 6L6 18"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"></path>
+      </svg>
+    </button>
+  </div>
+</header>
+
+<style>
+  .site-header {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    background: var(--surface);
+    border-bottom: 1px solid var(--line);
+    box-shadow: 0 1px 8px rgb(18 22 30 / 0.05);
+  }
+
+  .bar {
+    display: flex;
+    align-items: stretch;
+    justify-content: space-between;
+    gap: 1rem;
+    height: 72px;
+  }
+
+  .brand {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.55rem;
+    min-height: 44px;
+    white-space: nowrap;
+  }
+
+  .brand-mark {
+    flex: none;
+    width: auto;
+  }
+
+  .brand-name {
+    font-family: var(--sans);
+    font-size: 1.08rem;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    color: var(--ink);
+  }
+
+  .brand-divider {
+    flex: none;
+    width: 1px;
+    height: 22px;
+    background: var(--line);
+    margin-inline: 0.35rem;
+  }
+
+  .skku-mark {
+    width: 38px;
+    height: 38px;
+    flex: none;
+    object-fit: contain;
+  }
+
+  .brand-uni {
+    font-family: var(--sans);
+    font-size: 1.02rem;
+    font-weight: 500;
+    letter-spacing: -0.01em;
+    color: var(--ink-2);
+  }
+
+  .uni-short {
+    display: none;
+  }
+
+  /* nav links run the full height of the bar; the active marker is a
+     navy bar sitting flush on the header's bottom edge */
+  .site-nav,
+  .site-nav ul,
+  .site-nav li {
+    display: flex;
+    align-items: stretch;
+  }
+
+  .site-nav ul {
+    gap: clamp(0.25rem, 1.5vw, 1rem);
+  }
+
+  .site-nav a {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    padding: 0 0.35rem;
+    font-size: 0.94rem;
+    font-weight: 500;
+    color: var(--ink-2);
+    transition: color 0.15s ease;
+  }
+
+  .site-nav a::after {
+    content: "";
+    position: absolute;
+    inset-inline: 0;
+    bottom: -1px; /* covers the header hairline */
+    height: 3px;
+    background: var(--accent);
+    opacity: 0;
+    transform: scaleX(0.4);
+    transition: opacity 0.18s ease, transform 0.18s ease;
+  }
+
+  .site-nav a:hover {
+    color: var(--ink);
+  }
+
+  .site-nav a[aria-current="page"] {
+    color: var(--accent-strong);
+    font-weight: 650;
+  }
+
+  .site-nav a[aria-current="page"]::after {
+    opacity: 1;
+    transform: scaleX(1);
+  }
+
+  .nav-toggle {
+    display: none;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    align-self: center;
+    border-radius: var(--radius-sm);
+    color: var(--ink);
+  }
+
+  .nav-toggle:hover {
+    background: var(--surface-2);
+  }
+
+  .icon-close {
+    display: none;
+  }
+
+  :global([data-nav-open]) .icon-open {
+    display: none;
+  }
+
+  :global([data-nav-open]) .icon-close {
+    display: block;
+  }
+
+  @media (max-width: 860px) {
+    .nav-toggle {
+      display: inline-flex;
+    }
+
+    .site-nav {
+      display: none;
+      position: absolute;
+      top: 72px;
+      left: 0;
+      right: 0;
+      background: var(--surface);
+      border-bottom: 1px solid var(--line);
+      box-shadow: 0 12px 24px rgb(18 22 30 / 0.08);
+      padding: 0.5rem var(--pad) 1rem;
+    }
+
+    :global([data-nav-open]) .site-nav {
+      display: block;
+    }
+
+    .site-nav ul {
+      flex-direction: column;
+      align-items: stretch;
+      gap: 0.15rem;
+      width: 100%;
+    }
+
+    .site-nav a {
+      width: 100%;
+      padding: 0.7rem 0.85rem;
+      border-left: 3px solid transparent;
+      font-size: 1rem;
+    }
+
+    .site-nav a::after {
+      display: none;
+    }
+
+    .site-nav a[aria-current="page"] {
+      border-left-color: var(--accent);
+      background: var(--accent-tint);
+    }
+  }
+
+  /* long university name doesn't fit next to the menu button on phones */
+  @media (max-width: 600px) {
+    .uni-full {
+      display: none;
+    }
+
+    .uni-short {
+      display: inline;
+    }
+
+    .skku-mark {
+      width: 39px;
+      height: 39px;
+    }
+  }
+</style>
+
+<script>
+  const header = document.querySelector("[data-header]");
+  const toggle = document.querySelector("[data-nav-toggle]");
+
+  toggle?.addEventListener("click", () => {
+    const open = header?.toggleAttribute("data-nav-open");
+    toggle.setAttribute("aria-expanded", open ? "true" : "false");
+  });
+</script>
