@@ -1,7 +1,7 @@
 ---
 name: Seongjun Park
 role: msphd
-interests: Reinforcement learning for physical design
+interests: Latent Reasoning Optimization
 currentResearch: Efficient AI, LLM Reasoning
 email: seongjunpark_at_skku.edu
 links:
