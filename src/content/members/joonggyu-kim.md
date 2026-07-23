@@ -2,7 +2,7 @@
 name: Joonggyu Kim
 role: ms
 track: SSIT
-order: 4
+order: 1
 gameEligible: true
 labLead: false
 major: Department of Semiconductor and Display Engineering
