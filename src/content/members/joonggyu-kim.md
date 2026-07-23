@@ -9,5 +9,5 @@ major: Department of Semiconductor and Display Engineering
 interests: Image Generation Model, Computer Vision
 currentResearch: Generative AI-Based Camera ISP, Reinforcement Learning-Based ISP Optimization
 email: theanswer1_at_skku.edu
-image: /images/members/b.png
+image: /images/members/img2406-min.jpg
 ---
