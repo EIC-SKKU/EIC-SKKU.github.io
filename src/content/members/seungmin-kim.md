@@ -3,7 +3,7 @@ name: Seungmin Kim
 role: ms
 labLead: true
 email: seungmin.kim_at_skku.edu
-order: 1
+order: 3
 gameEligible: true
 major: Department of Semiconductor and Display Engineering
 interests: AI for EDA(Electronic Design Automation)
