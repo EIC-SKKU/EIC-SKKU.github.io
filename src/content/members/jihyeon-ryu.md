@@ -8,5 +8,5 @@ major: Department of Semiconductor and Display Engineering
 interests: Efficient AI, Al accelerator
 currentResearch: AI hardware accelerator architecture
 email: ryujh_at_g.skku.edu
-image: /images/members/g.jpg
+image: /images/members/1000027584-min.jpg
 ---
