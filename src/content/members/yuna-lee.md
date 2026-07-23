@@ -1,7 +1,7 @@
 ---
 name: Yuna Lee
 role: ms
-order: 3
+order: 4
 gameEligible: true
 labLead: false
 major: Department of Electrical and Computer Engineering
