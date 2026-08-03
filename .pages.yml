@@ -417,8 +417,6 @@ content:
         label: Abstract
         type: text
         description: Optional. Papers with an abstract get a clickable pop-up (title, authors, figure, abstract); papers without one stay plain text.
-        options:
-          maxlength: 1200
       - name: image
         label: Figure
         type: image

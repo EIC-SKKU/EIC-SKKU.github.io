@@ -2,7 +2,7 @@
 title: "AnalogToBi: Device-Level Analog Circuit Topology Generation via
   Bipartite Graph and Grammar Guided Decoding"
 year: "2026"
-order: 3
+order: 1
 authors: Seungmin Kim, Mingun Kim, Yuna Lee, Yulhwa Kim⁺
 venue: arXiv preprint arXiv:2603.08720
 venueShort: arXiv
