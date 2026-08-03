@@ -331,15 +331,18 @@ const linkLabels: Record<string, string> = {
     margin-top: 0.6rem;
   }
 
-  /* ---- pop-up: bigger than the member dialog, room for a figure ---- */
+  /* ---- pop-up: bigger than the member dialog, room for a figure ----
+     content is never clipped: the dialog itself scrolls when the figure
+     plus the full abstract run taller than the viewport */
   .pub-dialog {
     border: none;
     padding: 0;
     border-radius: var(--radius);
     max-width: min(720px, calc(100vw - 2rem));
+    max-height: calc(100vh - 2rem);
     max-height: calc(100dvh - 2rem);
     width: 100%;
-    overflow: hidden;
+    overflow-y: auto;
     box-shadow: 0 24px 60px rgb(15 20 30 / 0.25);
   }
 
@@ -352,8 +355,6 @@ const linkLabels: Record<string, string> = {
   }
 
   .pub-dialog-scroll {
-    max-height: calc(100dvh - 2rem);
-    overflow-y: auto;
     padding: clamp(1.5rem, 3vw, 2.25rem);
   }
 
@@ -435,11 +436,11 @@ const linkLabels: Record<string, string> = {
     flex: none;
   }
 
+  /* the figure keeps its natural aspect ratio — never cropped */
   .pub-dialog-image {
     display: block;
     width: 100%;
-    aspect-ratio: 8 / 5;
-    object-fit: cover;
+    height: auto;
     margin-top: 1.25rem;
     border-radius: var(--radius-sm);
     border: 1px solid var(--line);

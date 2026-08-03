@@ -20,6 +20,9 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          # full history — the home page sorts publications by git add date
+          fetch-depth: 0
       - name: Install, build, and upload site
         uses: withastro/action@v6
 

@@ -1,5 +1,6 @@
 ---
 import { getCollection } from "astro:content";
+import { execFileSync } from "node:child_process";
 import Base from "../layouts/Base.astro";
 import Carousel from "../components/Carousel.astro";
 
@@ -10,9 +11,36 @@ const news = (await getCollection("news"))
 const featured = (await getCollection("gallery", ({ data }) => data.featured))
   .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
 
+/* "recent" = when the entry was added to the site (git add date of its
+   file), not its publication year — so a freshly added paper surfaces
+   here no matter the venue (arXiv or otherwise). Files added in the same
+   commit (e.g. the initial import) tie and fall back to year/order.
+   Needs full git history at build time (deploy checkout uses fetch-depth: 0). */
+const addedAt = (filePath?: string) => {
+  if (!filePath) return 0;
+  try {
+    const stamps = execFileSync(
+      "git",
+      ["log", "--follow", "--diff-filter=A", "--format=%ct", "--", filePath],
+      { encoding: "utf8" }
+    ).trim();
+    const first = stamps.split("\n").at(-1);
+    return first ? Number(first) : 0;
+  } catch {
+    return 0;
+  }
+};
+
 const recentPubs = (await getCollection("publications"))
-  .sort((a, b) => b.data.year - a.data.year || a.data.order - b.data.order)
-  .slice(0, 3);
+  .map((pub) => ({ pub, added: addedAt(pub.filePath) }))
+  .sort(
+    (a, b) =>
+      b.added - a.added ||
+      b.pub.data.year - a.pub.data.year ||
+      a.pub.data.order - b.pub.data.order
+  )
+  .slice(0, 3)
+  .map(({ pub }) => pub);
 
 const fmt = (date: Date) =>
   date.toLocaleDateString("en-US", {
