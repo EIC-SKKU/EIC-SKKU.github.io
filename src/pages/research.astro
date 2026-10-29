@@ -193,15 +193,11 @@ const colors: Record<string, string> = {
     margin-top: 0.7rem;
   }
 
-  /* ---- recent papers, pinned to the card bottom ---- */
+  /* ---- recent papers ---- */
   .team-pubs {
-    margin-top: auto;
+    margin-top: 1.25rem;
     padding-top: 1.1rem;
     border-top: 1px solid var(--line);
-  }
-
-  .team-body + .team-pubs {
-    margin-top: 1.25rem;
   }
 
   .pubs-head {
@@ -265,6 +261,16 @@ const colors: Record<string, string> = {
 
   .all-link:hover {
     color: var(--accent-strong);
+  }
+
+  @media (min-width: 861px) {
+    /* Share content rows so adjacent cards keep their paper dividers aligned. */
+    .team:not(.featured) {
+      display: grid;
+      grid-row: span 3;
+      grid-template-rows: subgrid;
+      row-gap: 0;
+    }
   }
 
   @media (max-width: 860px) {
