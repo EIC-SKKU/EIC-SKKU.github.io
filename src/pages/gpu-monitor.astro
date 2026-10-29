@@ -1,0 +1,101 @@
+---
+import Base from "../layouts/Base.astro";
+
+const monitorUrl = "http://115.145.209.141:9000/";
+---
+
+<Base title="GPU Monitor" description="GPU Monitor access for EIC Lab members." noindex>
+  <section class="container section monitor-page" aria-labelledby="monitor-title">
+    <p class="kicker">Member access</p>
+    <h1 id="monitor-title">GPU Monitor</h1>
+    <p class="intro">Check GPU availability and usage on the lab network.</p>
+
+    <div class="connection-card">
+      <div class="connection-status">
+        <span class="status-dot" aria-hidden="true"></span>
+        <div>
+          <h2>SKKU VPN required</h2>
+          <p>
+            Connect to SKKU VPN, then open GPU Monitor. If you are already
+            connected, you can continue below.
+          </p>
+        </div>
+      </div>
+      <div class="actions">
+        <a class="btn btn-primary" href={monitorUrl}>Open GPU Monitor <span aria-hidden="true">↗</span></a>
+      </div>
+    </div>
+    <a class="back-link" href="/">← Back to EIC Lab</a>
+  </section>
+</Base>
+
+<style>
+  .monitor-page {
+    max-width: 780px;
+    min-height: 55vh;
+  }
+
+  h1 {
+    margin-top: 0.7rem;
+    font-size: clamp(2rem, 4vw, 2.75rem);
+  }
+
+  .intro {
+    margin-top: 0.8rem;
+    color: var(--ink-2);
+  }
+
+  .connection-card {
+    margin-top: 2rem;
+    padding: clamp(1.25rem, 4vw, 2rem);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    background: var(--surface-2);
+  }
+
+  .connection-status {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.8rem;
+  }
+
+  .status-dot {
+    width: 9px;
+    height: 9px;
+    margin-top: 0.4rem;
+    flex: none;
+    border-radius: 50%;
+    background: var(--accent);
+  }
+
+  h2 {
+    font-size: 1.12rem;
+    line-height: 1.4;
+  }
+
+  .connection-status p {
+    margin-top: 0.6rem;
+    color: var(--ink-2);
+    font-size: 0.94rem;
+  }
+
+  .actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin-top: 1.5rem;
+  }
+
+  .back-link {
+    display: inline-block;
+    margin-top: 1.5rem;
+    color: var(--ink-2);
+    font-size: 0.9rem;
+  }
+
+  .back-link:hover {
+    color: var(--accent);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+</style>
