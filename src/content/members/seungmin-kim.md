@@ -3,6 +3,8 @@ name: Seungmin Kim
 role: ms
 labLead: true
 email: seungmin.kim_at_skku.edu
+links:
+  scholar: https://scholar.google.com/citations?hl=ko&user=64514u4AAAAJ
 order: 3
 gameEligible: true
 major: Department of Semiconductor and Display Engineering

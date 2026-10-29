@@ -59,7 +59,16 @@ const slides = featured.map((item) => ({
 <Base>
   <section class="container home">
     <header class="identity">
-      <h1>Efficient &amp; Intelligent Computing Lab</h1>
+      <h1>Efficient &amp; Intelligent Computing (EIC) Lab</h1>
+      <div class="intro">
+        <p>Welcome to EIC Lab at Sungkyunkwan University.</p>
+        <p>
+          With the mission of making AI more efficient and leveraging AI to
+          solve real-world problems, our research focuses on three key areas:
+          Efficient AI, Computer Architecture, and Electronic Design Automation
+          (EDA).
+        </p>
+      </div>
     </header>
 
     <div class="main-grid">
@@ -131,11 +140,6 @@ const slides = featured.map((item) => ({
 
   /* ---- identity line ---- */
   .identity {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    justify-content: space-between;
-    gap: 0.7rem 1.5rem;
     padding-bottom: clamp(2rem, 4vw, 3rem);
     margin-bottom: clamp(2rem, 4vw, 3rem);
     border-bottom: 1px solid var(--line);
@@ -144,6 +148,18 @@ const slides = featured.map((item) => ({
   .identity h1 {
     font-size: clamp(1.6rem, 3.2vw, 2.1rem);
     font-weight: 650;
+  }
+
+  .intro {
+    margin-top: 1.1rem;
+    max-width: 88ch;
+    color: var(--ink-2);
+    font-size: 1.02rem;
+    line-height: 1.65;
+  }
+
+  .intro p + p {
+    margin-top: 0.45rem;
   }
 
   /* ---- news + carousel ---- */

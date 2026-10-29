@@ -2,11 +2,11 @@
 name: Yulhwa Kim
 role: professor
 image: /images/members/a.jpg
-interests: Efficient deep learning, hardware–software co-design, intelligent
-  computing systems
-email: yulhwa.kim@skku.edu
+email: yulhwakim@skku.edu
+phone: +82-31-299-4911
+office: "Room #400306, Semiconductor building"
 links:
-  scholar: "#"
+  scholar: https://scholar.google.com/citations?hl=ko&user=VRkM404AAAAJ
   orcid: "#"
   dblp: "#"
   cv: "#"

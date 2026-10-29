@@ -1,14 +1,8 @@
 ---
 title: "Efficient AI"
 icon: llm
-tagline: "Efficient training, compression, and serving of language and vision models."
+tagline: "Efficient Training and Deployment of Language and Vision Models"
 order: 1
 ---
 
-We study how to train, compress, and serve large language models at a
-fraction of today's cost — quantization, sparsity, KV-cache management,
-and efficient serving systems.
-
-On the vision side, we build compact models for real-world perception:
-token pruning and merging for vision transformers, efficient video
-understanding, and deployment on edge devices.
+We develop techniques to reduce the computational and memory costs of training and deploying large-scale language and vision models. Our research focuses on efficient training methods, model compression techniques such as quantization and sparsity, KV-cache optimization, and efficient inference and serving systems.

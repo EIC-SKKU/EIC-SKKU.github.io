@@ -38,6 +38,9 @@ const members = defineCollection({
     /** free-form publication entries shown in the member pop-up */
     publications: z.array(z.string()).default([]),
     email: z.string().optional(),
+    /** professor contact details shown in the contact pop-up */
+    phone: z.string().optional(),
+    office: z.string().optional(),
     links: z
       .object({
         about: z.string().optional(),

@@ -292,19 +292,27 @@ content:
       - name: interests
         label: Research interests
         type: text
-        description: A short comma-separated summary. Alumni may leave this empty.
+        description: A short comma-separated summary for students. Not shown for the professor; alumni may leave this empty.
         options:
           maxlength: 240
       - name: currentResearch
         label: Current research
         type: text
-        description: Rough description of what they are working on right now, shown in the member pop-up.
+        description: Rough description of what a student is working on right now, shown in their member pop-up. Not shown for the professor.
         options:
           maxlength: 240
       - name: email
         label: Email
         type: string
-        description: Optional public university email address.
+        description: Optional public email address. Student addresses display with _at_ and _dot_; the professor's address stays plain.
+      - name: phone
+        label: Contact phone
+        type: string
+        description: Professor only. Shown in the contact pop-up.
+      - name: office
+        label: Office
+        type: string
+        description: Professor only. Building, floor, and room shown in the contact pop-up.
       - name: publications
         label: Publications
         type: string

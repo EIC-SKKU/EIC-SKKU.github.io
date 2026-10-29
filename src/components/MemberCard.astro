@@ -1,5 +1,6 @@
 ---
 import MemberDialog from "./MemberDialog.astro";
+import { formatEmail, normalizeEmail } from "../lib/email";
 
 interface Props {
   memberId: string;
@@ -107,7 +108,7 @@ const externalLinks = [
     </h3>
     <p class="position">{position}{track && ` · ${track}`}</p>
     {interests && <p class="interests">{interests}</p>}
-    {email && <a class="email" href={`mailto:${email}`}>{email}</a>}
+    {email && <a class="email" href={`mailto:${normalizeEmail(email)}`}>{formatEmail(email)}</a>}
   </div>
 
   <MemberDialog
@@ -367,6 +368,7 @@ const externalLinks = [
     display: inline-flex;
     align-items: center;
     align-self: center;
+    max-width: 100%;
     margin-top: auto;
     padding: 0.34rem 0.75rem;
     border: 1px solid var(--line);
@@ -377,6 +379,7 @@ const externalLinks = [
     font-weight: 500;
     color: var(--ink-2);
     line-height: 1.2;
+    overflow-wrap: anywhere;
     transition: border-color 0.15s ease, color 0.15s ease,
       background-color 0.15s ease;
   }

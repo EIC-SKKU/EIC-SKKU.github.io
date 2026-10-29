@@ -5,8 +5,6 @@ interests: Efficient AI, Multimodal, AI Agent Systems
 currentResearch: Efficient LLM Compression (KV Cache, Quantization)
 links:
   about: "#"
-  website: "#"
-  scholar: "#"
 order: 4
 gameEligible: true
 labLead: false

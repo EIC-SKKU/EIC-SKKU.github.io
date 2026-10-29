@@ -3,6 +3,7 @@ import { getCollection, render } from "astro:content";
 import Base from "../layouts/Base.astro";
 import PageHeader from "../components/PageHeader.astro";
 import MemberCard from "../components/MemberCard.astro";
+import MemberDialog from "../components/MemberDialog.astro";
 import { ROLE_LABELS } from "../lib/roles";
 
 const members = await getCollection("members");
@@ -48,7 +49,18 @@ const alumni = byRole("alumni");
               decoding="async"
             />
             <div class="prof-body">
-              <h3>{professor.data.name}</h3>
+              <h3>
+                <button
+                  class="prof-open"
+                  type="button"
+                  data-open
+                  aria-haspopup="dialog"
+                  aria-controls={`member-dialog-${professor.id}`}
+                  aria-label={`Contact ${professor.data.name}`}
+                >
+                  {professor.data.name}
+                </button>
+              </h3>
               <p class="prof-role">Professor</p>
               {professor.data.major && (
                 <p class="prof-major">{professor.data.major}</p>
@@ -75,6 +87,18 @@ const alumni = byRole("alumni");
               </div>
             </div>
           </article>
+          <MemberDialog
+            dialogId={`member-dialog-${professor.id}`}
+            name={professor.data.name}
+            position="Professor"
+            major={professor.data.major}
+            image={professor.data.image}
+            variant="contact"
+            email={professor.data.email}
+            phone={professor.data.phone}
+            office={professor.data.office}
+            links={professor.data.links}
+          />
         </section>
       )
     }
@@ -178,10 +202,33 @@ const alumni = byRole("alumni");
 
   /* ---- professor ---- */
   .prof {
+    position: relative;
     display: grid;
     grid-template-columns: minmax(260px, 26%) 1fr;
     overflow: hidden;
     scroll-margin-top: 90px; /* clears the sticky site header when linked to */
+    transition: border-color 0.15s ease;
+  }
+
+  .prof:hover {
+    border-color: var(--accent-line);
+  }
+
+  .prof-open {
+    font: inherit;
+    letter-spacing: inherit;
+    text-align: left;
+  }
+
+  .prof-open::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    cursor: pointer;
+  }
+
+  .prof:hover .prof-open {
+    color: var(--accent-strong);
   }
 
   /* photo fills its column edge-to-edge; the card's radius rounds the
@@ -233,6 +280,12 @@ const alumni = byRole("alumni");
     flex-wrap: wrap;
     gap: 0.5rem;
     margin-top: 1.1rem;
+  }
+
+  .prof-links a,
+  .prof-bio :global(a) {
+    position: relative;
+    z-index: 1;
   }
 
   /* ---- student grid ---- */

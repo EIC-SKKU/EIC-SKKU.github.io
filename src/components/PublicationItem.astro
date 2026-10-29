@@ -49,8 +49,7 @@ const linkLabels: Record<string, string> = {
         parts.map((part) => {
           const m = matchMember(part);
           if (!m) return part;
-          // professor has no pop-up on the Members page (her info is shown
-          // inline there already), so her name still links to the page;
+          // professor links back to her full profile on the Members page;
           // everyone else opens their existing member pop-up right here
           return m.role === "professor" ? (
             <a class="member-name" href={`/members/#member-${m.id}`}>
