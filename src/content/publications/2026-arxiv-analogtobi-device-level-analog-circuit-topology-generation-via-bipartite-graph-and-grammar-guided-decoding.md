@@ -5,8 +5,8 @@ year: "2026"
 order: 1
 authors: Seungmin Kim, Mingun Kim, Yuna Lee, Yulhwa Kim⁺
 venue: arXiv preprint arXiv:2603.08720
-venueShort: arXiv
-preprint: true
+venueShort: NeurIPS
+preprint: false
 abstract: Analog circuit design remains highly dependent on expert knowledge due
   to the complexity of device-level interactions and topology design. Recent
   transformer-based approaches for device-level topology generation have shown
@@ -27,4 +27,5 @@ links:
   paper: https://arxiv.org/abs/2603.08720
   code: https://github.com/Seungmin0825/AnalogToBi
 area: eda
+venueType: conference
 ---
