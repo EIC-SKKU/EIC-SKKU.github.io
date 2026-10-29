@@ -4,7 +4,7 @@ role: ms
 order: 9
 gameEligible: true
 labLead: false
-major: Department of Electronic and Electrical Engineering
+major: Department of Electrical and Computer Engineering
 interests: Efficient AI Algorithm
 currentResearch: KV cache compression for efficient LLM reasoning
 email: sychaeee_at_skku.edu
