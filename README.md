@@ -72,8 +72,8 @@ The professor's Markdown body (below the frontmatter) is rendered as a short bio
 Their `facultyTitle` can be `Assistant Professor`, `Associate Professor`, or
 `Professor`. Student pop-ups automatically include matching papers from the
 Publications collection; `publications` can contain additional free-form entries.
-Leave `links.linkedin` empty to show an inactive LinkedIn icon, then supply the
-full profile URL when available.
+The LinkedIn icon appears only when `links.linkedin` contains a full profile URL.
+Leave it empty to hide the icon.
 
 ### Publications — `src/content/publications/`
 

@@ -60,9 +60,8 @@ tab.
   member names. Use **Additional publications** only for papers not already in
   the Publications collection. Ambiguous duplicate names are not matched
   automatically; their additional entries can be maintained manually.
-- A LinkedIn icon appears beside each student's name. Leave **Profile links →
-  LinkedIn** empty for the inactive placeholder, then add the full profile URL
-  when available.
+- A LinkedIn icon appears beside a student's name only when **Profile links →
+  LinkedIn** contains a URL. Leave it empty to hide the icon.
 - Gallery images should be landscape 4:3. Aim for at least 1600 x 1200 pixels.
 - Prefer WebP or optimized JPEG files and keep individual images below 2 MB.
 - Member and research display orders still put lower numbers first.

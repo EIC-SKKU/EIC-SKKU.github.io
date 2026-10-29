@@ -55,7 +55,7 @@ components:
       - name: linkedin
         label: LinkedIn
         type: string
-        description: Full LinkedIn profile URL including https://. Leave empty to show an inactive placeholder on student profiles.
+        description: Full LinkedIn profile URL including https://. The icon appears only when a URL is provided.
       - name: orcid
         label: ORCID
         type: string

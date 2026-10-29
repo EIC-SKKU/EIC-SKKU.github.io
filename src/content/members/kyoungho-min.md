@@ -11,4 +11,5 @@ image: /images/members/kyoungho-min.png
 email: kyohmin_at_skku_dot_edu
 links:
   website: https://kyounghomin.com
+  linkedin: https://www.linkedin.com/in/kyounghomin/
 ---
