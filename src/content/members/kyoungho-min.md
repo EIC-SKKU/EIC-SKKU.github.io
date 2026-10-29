@@ -9,4 +9,6 @@ labLead: false
 major: Department of Electrical and Computer Engineering
 image: /images/members/file.jpg
 email: kyohmin_at_skku_dot_edu
+links:
+  website: https://kyounghomin.com
 ---
