@@ -8,12 +8,14 @@ interface Props {
   title?: string;
   description?: string;
   noindex?: boolean;
+  bodyClass?: string;
 }
 
 const {
   title,
   description = "EIC Lab at Sungkyunkwan University — research on efficient and intelligent computing across large language models, computer vision, design automation, and computer architecture.",
   noindex = false,
+  bodyClass,
 } = Astro.props;
 
 const pageTitle = title ? `${title} · EIC Lab` : "EIC Lab · SKKU";
@@ -52,7 +54,7 @@ const placeholderNoindex = true;
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="generator" content={Astro.generator} />
   </head>
-  <body>
+  <body class={bodyClass}>
     <a class="skip-link" href="#main">Skip to content</a>
     <Header />
     <main id="main">

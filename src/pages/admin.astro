@@ -2,7 +2,7 @@
 import Base from "../layouts/Base.astro";
 ---
 
-<Base title="Content Manager" noindex>
+<Base title="Content Manager" noindex bodyClass="admin-page">
   <section class="admin container">
     <h1>Content Manager</h1>
     <a
@@ -17,13 +17,34 @@ import Base from "../layouts/Base.astro";
 </Base>
 
 <style>
+  :global(body.admin-page) {
+    min-height: 100vh;
+    min-height: 100dvh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  :global(.admin-page > #main) {
+    flex: 1;
+    display: grid;
+  }
+
+  :global(.admin-page > .site-header) {
+    flex-shrink: 0;
+  }
+
+  :global(.admin-page > .site-footer) {
+    flex-shrink: 0;
+    margin-top: 0;
+  }
+
   .admin {
-    min-height: 42vh;
+    width: 100%;
     display: grid;
     place-content: center;
     justify-items: center;
     gap: 1.25rem;
-    padding-block: clamp(4rem, 10vw, 8rem);
+    padding-block: clamp(2rem, 6vh, 4rem);
     text-align: center;
   }
 
