@@ -113,7 +113,7 @@ const externalLinks = [
           <>
             <p class="label">Email</p>
             <a class="email-link" href={`mailto:${normalizeEmail(email)}`}>
-              {variant === "contact" ? normalizeEmail(email) : formatEmail(email)}
+              {formatEmail(email)}
             </a>
           </>
         )

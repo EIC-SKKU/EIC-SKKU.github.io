@@ -5,6 +5,7 @@ import PageHeader from "../components/PageHeader.astro";
 import MemberCard from "../components/MemberCard.astro";
 import MemberDialog from "../components/MemberDialog.astro";
 import { ROLE_LABELS } from "../lib/roles";
+import { formatEmail, normalizeEmail } from "../lib/email";
 
 const members = await getCollection("members");
 const byRole = (role: string) =>
@@ -70,8 +71,8 @@ const alumni = byRole("alumni");
               </div>
               <div class="prof-links">
                 {professor.data.email && (
-                  <a class="chip" href={`mailto:${professor.data.email}`}>
-                    {professor.data.email}
+                  <a class="chip" href={`mailto:${normalizeEmail(professor.data.email)}`}>
+                    {formatEmail(professor.data.email)}
                   </a>
                 )}
                 {[

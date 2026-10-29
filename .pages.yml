@@ -304,7 +304,7 @@ content:
       - name: email
         label: Email
         type: string
-        description: Optional public email address. Student addresses display with _at_ and _dot_; the professor's address stays plain.
+        description: Optional public email address. Addresses display with _at_ and _dot_ while their email links use the actual address.
       - name: phone
         label: Contact phone
         type: string
