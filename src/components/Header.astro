@@ -67,6 +67,16 @@ const isActive = (href: string) =>
             </li>
           ))
         }
+        <li class="monitor-link">
+          <span class="brand-divider nav-divider" aria-hidden="true"></span>
+          <a
+            href="http://115.145.209.141:9000/"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            GPU Monitor<span class="visually-hidden"> (opens in a new tab)</span>
+          </a>
+        </li>
       </ul>
     </nav>
 
@@ -175,6 +185,14 @@ const isActive = (href: string) =>
     gap: clamp(0.25rem, 1.5vw, 1rem);
   }
 
+  .monitor-link {
+    gap: 0.65rem;
+  }
+
+  .nav-divider {
+    align-self: center;
+  }
+
   .site-nav a {
     position: relative;
     display: inline-flex;
@@ -182,6 +200,7 @@ const isActive = (href: string) =>
     padding: 0 0.35rem;
     font-size: 0.94rem;
     font-weight: 500;
+    white-space: nowrap;
     color: var(--ink-2);
     transition: color 0.15s ease;
   }
@@ -239,7 +258,7 @@ const isActive = (href: string) =>
     display: block;
   }
 
-  @media (max-width: 860px) {
+  @media (max-width: 1080px) {
     .nav-toggle {
       display: inline-flex;
     }
@@ -265,6 +284,16 @@ const isActive = (href: string) =>
       align-items: stretch;
       gap: 0.15rem;
       width: 100%;
+    }
+
+    .monitor-link {
+      margin-top: 0.35rem;
+      padding-top: 0.35rem;
+      border-top: 1px solid var(--line);
+    }
+
+    .nav-divider {
+      display: none;
     }
 
     .site-nav a {
