@@ -1,5 +1,7 @@
 ---
 import { formatEmail, normalizeEmail } from "../lib/email";
+import type { CollectionEntry } from "astro:content";
+import LinkedInLink from "./LinkedInLink.astro";
 
 interface Props {
   name: string;
@@ -10,6 +12,7 @@ interface Props {
   interests?: string;
   currentResearch?: string;
   publications?: string[];
+  linkedPublications?: CollectionEntry<"publications">[];
   email?: string;
   variant?: "profile" | "contact";
   phone?: string;
@@ -17,6 +20,7 @@ interface Props {
   links?: {
     website?: string;
     scholar?: string;
+    linkedin?: string;
   };
   dialogId: string;
 }
@@ -30,6 +34,7 @@ const {
   interests,
   currentResearch,
   publications = [],
+  linkedPublications = [],
   email,
   variant = "profile",
   phone,
@@ -44,6 +49,24 @@ const externalLinks = [
   { label: "Website", href: links.website },
   { label: "Scholar", href: links.scholar },
 ].filter((item) => item.href);
+
+interface PublicationSummary {
+  title: string;
+  detail?: string;
+  href?: string;
+}
+
+const linkedTitles = new Set(linkedPublications.map((pub) => pub.data.title.trim().toLowerCase()));
+const publicationItems: PublicationSummary[] = [
+  ...linkedPublications.map((pub) => ({
+    title: pub.data.title,
+    detail: `${pub.data.venueShort || pub.data.venue} · ${pub.data.year}${pub.data.preprint ? " · Preprint" : ""}`,
+    href: pub.data.links.paper || pub.data.links.doi || `/publications/#publication-${pub.id}`,
+  })),
+  ...publications
+    .filter((title) => !linkedTitles.has(title.trim().toLowerCase()))
+    .map((title) => ({ title })),
+];
 ---
 
 <dialog
@@ -73,7 +96,10 @@ const externalLinks = [
         decoding="async"
       />
       <div class="dialog-title">
-        <h3>{name}</h3>
+        <div class="dialog-name-row">
+          <h3>{name}</h3>
+          {variant === "profile" && <LinkedInLink name={name} url={links.linkedin} />}
+        </div>
         <p class="position">{position}{track && ` · ${track}`}</p>
         {major && <p class="major">{major}</p>}
       </div>
@@ -97,15 +123,33 @@ const externalLinks = [
         )
       }
       {
-        variant === "profile" && publications.length > 0 && (
-          <>
-            <p class="label">Publications</p>
-            <ul class="pub-list">
-              {publications.map((pub) => (
-                <li>{pub}</li>
-              ))}
-            </ul>
-          </>
+        variant === "profile" && (
+          <section class="profile-publications" aria-labelledby={`${dialogId}-publications`}>
+            <h4 id={`${dialogId}-publications`} class="publications-heading">
+              Publications
+              {publicationItems.length > 0 && <span class="publication-count">{publicationItems.length}</span>}
+            </h4>
+            {publicationItems.length > 0 ? (
+              <ul class="pub-list">
+                {publicationItems.map((pub) => (
+                  <li>
+                    <svg class="paper-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                      <path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z" />
+                      <path d="M14 3v5h5M9 13h6M9 17h4" />
+                    </svg>
+                    <div class="paper-summary">
+                      {pub.href ? (
+                        <a class="paper-title" href={pub.href} target="_blank" rel="noopener noreferrer">
+                          {pub.title}<span class="visually-hidden"> (opens in a new tab)</span>
+                        </a>
+                      ) : <span class="paper-title">{pub.title}</span>}
+                      {pub.detail && <p class="paper-detail">{pub.detail}</p>}
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            ) : <p class="empty-publications">No publications listed yet.</p>}
+          </section>
         )
       }
       {
@@ -210,9 +254,23 @@ const externalLinks = [
     border-radius: var(--radius-sm);
   }
 
-  .dialog-title h3 {
-    font-size: 1.4rem;
+  .dialog-title {
+    flex: 1;
+    min-width: 0;
     padding-right: 2.25rem;
+  }
+
+  .dialog-name-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    gap: 0.4rem;
+  }
+
+  .dialog-title h3 {
+    flex: 1 1 8rem;
+    min-width: 0;
+    font-size: 1.4rem;
   }
 
   .position {
@@ -272,25 +330,75 @@ const externalLinks = [
     text-underline-offset: 3px;
   }
 
+  .profile-publications {
+    margin-top: 1.25rem;
+    padding-top: 1.1rem;
+    border-top: 1px solid var(--line);
+  }
+
+  .publications-heading {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.96rem;
+  }
+
+  .publication-count {
+    padding: 0.1rem 0.45rem;
+    border-radius: 999px;
+    background: var(--surface-2);
+    color: var(--ink-2);
+    font-size: 0.72rem;
+    font-weight: 500;
+  }
+
   .pub-list {
-    margin-top: 0.3rem;
-    display: grid;
-    gap: 0.4rem;
+    margin-top: 0.8rem;
   }
 
   .pub-list li {
-    position: relative;
-    padding-left: 1em;
-    font-size: 0.88rem;
-    line-height: 1.5;
-    color: var(--ink-2);
+    display: grid;
+    grid-template-columns: 17px minmax(0, 1fr);
+    gap: 0.65rem;
   }
 
-  .pub-list li::before {
-    content: "–";
-    position: absolute;
-    left: 0;
+  .pub-list li + li {
+    margin-top: 0.85rem;
+    padding-top: 0.85rem;
+    border-top: 1px solid var(--line);
+  }
+
+  .paper-icon {
+    width: 17px;
+    height: 17px;
+    margin-top: 0.15rem;
+    color: var(--accent);
+  }
+
+  .paper-title {
+    font-size: 0.9rem;
+    font-weight: 550;
+    line-height: 1.5;
+    color: var(--ink);
+    overflow-wrap: anywhere;
+  }
+
+  a.paper-title:hover {
+    color: var(--accent-strong);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+
+  .paper-detail {
+    margin-top: 0.3rem;
+    font-size: 0.75rem;
     color: var(--ink-3);
+  }
+
+  .empty-publications {
+    margin-top: 0.5rem;
+    font-size: 0.88rem;
+    color: var(--ink-2);
   }
 
   .links {

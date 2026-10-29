@@ -52,6 +52,10 @@ components:
         label: Google Scholar
         type: string
         description: Full Google Scholar profile URL.
+      - name: linkedin
+        label: LinkedIn
+        type: string
+        description: Full LinkedIn profile URL including https://. Leave empty to show an inactive placeholder on student profiles.
       - name: orcid
         label: ORCID
         type: string
@@ -259,6 +263,13 @@ content:
               label: Undergraduate researcher
             - name: alumni
               label: Alumni
+      - name: facultyTitle
+        label: Faculty title
+        type: select
+        default: Professor
+        description: Professor only. Used on the member card and contact pop-up.
+        options:
+          values: [Assistant Professor, Associate Professor, Professor]
       - name: gameEligible
         label: Include in member roulette
         type: boolean
@@ -314,10 +325,10 @@ content:
         type: string
         description: Professor only. Building, floor, and room shown in the contact pop-up.
       - name: publications
-        label: Publications
+        label: Additional publications
         type: string
         list: true
-        description: "One entry per line, e.g. Title — Venue, Year. Shown in the member pop-up."
+        description: "Papers in Publications are matched automatically by author name. Add only extra papers here, one per line, e.g. Title — Venue, Year."
       - name: links
         component: profile_links
       - name: formerPosition
@@ -375,19 +386,16 @@ content:
           placeholder: Select a year
           values: [2030, 2029, 2028, 2027, 2026, 2025, 2024, 2023, 2022, 2021, 2020, 2019, 2018, 2017, 2016, 2015, 2014, 2013, 2012, 2011, 2010]
       - name: order
-        label: Order within year
+        label: Publication order (optional)
         type: number
-        required: true
-        default: 99
-        description: Lower numbers appear first within the selected year.
+        description: "1 is oldest; higher numbers appear first within a year. Leave blank for the next available number at build time. Automatic values are not written back into this field."
         options:
           min: 1
-          max: 999
       - name: authors
         label: Authors
         type: text
         required: true
-        description: Enter names in the exact order used by the paper.
+        description: Enter names in the exact order used by the paper. Match the member's display name to include the paper in their profile automatically.
         options:
           maxlength: 500
       - name: venue

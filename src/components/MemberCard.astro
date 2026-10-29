@@ -1,5 +1,7 @@
 ---
 import MemberDialog from "./MemberDialog.astro";
+import LinkedInLink from "./LinkedInLink.astro";
+import type { CollectionEntry } from "astro:content";
 import { formatEmail, normalizeEmail } from "../lib/email";
 
 interface Props {
@@ -13,11 +15,13 @@ interface Props {
   interests?: string;
   currentResearch?: string;
   publications?: string[];
+  linkedPublications?: CollectionEntry<"publications">[];
   email?: string;
   links?: {
     about?: string;
     website?: string;
     scholar?: string;
+    linkedin?: string;
   };
 }
 
@@ -32,6 +36,7 @@ const {
   interests,
   currentResearch,
   publications = [],
+  linkedPublications = [],
   email,
   links = {},
 } = Astro.props;
@@ -48,14 +53,23 @@ const externalLinks = [
 
 <article class="member-card card" id={anchorId} data-member>
   <div class="photo">
-    <img
-      src={photo}
-      alt={`Portrait of ${name}`}
-      width="400"
-      height="400"
-      loading="lazy"
-      decoding="async"
-    />
+    <button
+      class="photo-open"
+      type="button"
+      data-open
+      aria-haspopup="dialog"
+      aria-controls={dialogId}
+      aria-label={`View ${name}'s profile and publications`}
+    >
+      <img
+        src={photo}
+        alt={`Portrait of ${name}`}
+        width="400"
+        height="400"
+        loading="lazy"
+        decoding="async"
+      />
+    </button>
     {
       labLead && (
         <span
@@ -94,18 +108,21 @@ const externalLinks = [
     </div>
   </div>
   <div class="body">
-    <h3>
-      <!-- stretched button: clicking anywhere on the card opens the dialog -->
-      <button
-        class="open"
-        type="button"
-        data-open
-        aria-haspopup="dialog"
-        aria-controls={dialogId}
-      >
-        {name}
-      </button>
-    </h3>
+    <div class="member-name-row">
+      <h3>
+        <!-- The stretched name button opens the profile from the card body. -->
+        <button
+          class="open"
+          type="button"
+          data-open
+          aria-haspopup="dialog"
+          aria-controls={dialogId}
+        >
+          {name}
+        </button>
+      </h3>
+      <LinkedInLink name={name} url={links.linkedin} />
+    </div>
     <p class="position">{position}{track && ` · ${track}`}</p>
     {interests && <p class="interests">{interests}</p>}
     {email && <a class="email" href={`mailto:${normalizeEmail(email)}`}>{formatEmail(email)}</a>}
@@ -121,6 +138,7 @@ const externalLinks = [
     interests={interests}
     currentResearch={currentResearch}
     publications={publications}
+    linkedPublications={linkedPublications}
     email={email}
     links={links}
   />
@@ -142,9 +160,21 @@ const externalLinks = [
 
   .photo {
     position: relative;
+    z-index: 1;
     /* lets the link pills below react to the card's own width, not the
        viewport — accurate regardless of how many grid columns are active */
     container-type: inline-size;
+  }
+
+  .photo-open {
+    display: block;
+    width: 100%;
+    cursor: pointer;
+  }
+
+  .photo-open:focus-visible {
+    outline: 3px solid var(--accent);
+    outline-offset: -3px;
   }
 
   .photo img {
@@ -154,8 +184,8 @@ const externalLinks = [
     transition: filter 0.2s ease;
   }
 
-  .member-card:hover .photo > img,
-  .member-card:focus-within .photo > img {
+  .member-card:hover .photo-open img,
+  .member-card:focus-within .photo-open img {
     filter: brightness(0.86);
   }
 
@@ -231,9 +261,11 @@ const externalLinks = [
     padding: 0.7rem 0.85rem;
     background: var(--surface);
     border-bottom: 1px solid var(--line);
+    pointer-events: none;
   }
 
   .link-pill {
+    pointer-events: auto;
     display: inline-flex;
     align-items: center;
     padding: 0.42rem 0.8rem;
@@ -311,7 +343,16 @@ const externalLinks = [
     padding: 1rem 1.1rem 1.15rem;
   }
 
+  .member-name-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.4rem;
+    width: 100%;
+  }
+
   h3 {
+    flex: 1;
+    min-width: 0;
     font-size: 1.15rem;
   }
 

@@ -6,6 +6,8 @@ import PageHeader from "../components/PageHeader.astro";
 import PublicationItem from "../components/PublicationItem.astro";
 import MemberDialog from "../components/MemberDialog.astro";
 import { ROLE_LABELS } from "../lib/roles";
+import { buildMemberPublications } from "../lib/member-publications";
+import { getOrderedPublications, comparePublicationsNewestFirst } from "../lib/publications";
 import {
   buildMemberMaps,
   isAuthorSeparator,
@@ -14,15 +16,16 @@ import {
   type MatchedMember,
 } from "../lib/authors";
 
-const pubs = await getCollection("publications");
+const pubs = await getOrderedPublications();
 const allMembers = await getCollection("members");
+const publicationsByMember = buildMemberPublications(allMembers, pubs);
 const { membersByName, membersById } = buildMemberMaps(allMembers);
 
 /* preprints are pending publication — they live in a dedicated section on
    top of the page instead of inside the year groups */
 const preprints = pubs
   .filter((p) => p.data.preprint)
-  .sort((a, b) => b.data.year - a.data.year || a.data.order - b.data.order);
+  .sort(comparePublicationsNewestFirst);
 
 const published = pubs.filter((p) => !p.data.preprint);
 
@@ -73,7 +76,7 @@ const groupsFor = (years: number[]) => {
       label,
       items: inYears
         .filter((p) => typeOf(p) === label)
-        .sort((a, b) => a.data.order - b.data.order),
+        .sort(comparePublicationsNewestFirst),
     }))
     .filter((section) => section.items.length > 0);
 };
@@ -160,6 +163,7 @@ const hasMarkers = pubs.some((p) => /[*⁺]/.test(p.data.authors));
         interests={m.data.interests}
         currentResearch={m.data.currentResearch}
         publications={m.data.publications}
+        linkedPublications={publicationsByMember.get(m.id)}
         email={m.data.email}
         links={m.data.links}
       />

@@ -42,7 +42,7 @@ const linkLabels: Record<string, string> = {
 
 ---
 
-<li class:list={["pub", { clickable: hasDetails }]} data-pub>
+<li id={`publication-${pub.id}`} class:list={["pub", { clickable: hasDetails }]} data-pub>
   <p class="ref">
     <span class="authors">
       {
@@ -221,6 +221,7 @@ const linkLabels: Record<string, string> = {
 <style>
   .pub {
     position: relative;
+    scroll-margin-top: 90px;
     margin: -0.85rem -1rem;
     padding: 0.85rem 1rem;
     border-radius: var(--radius-sm);

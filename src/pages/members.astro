@@ -6,8 +6,11 @@ import MemberCard from "../components/MemberCard.astro";
 import MemberDialog from "../components/MemberDialog.astro";
 import { ROLE_LABELS } from "../lib/roles";
 import { formatEmail, normalizeEmail } from "../lib/email";
+import { buildMemberPublications } from "../lib/member-publications";
+import { getOrderedPublications } from "../lib/publications";
 
 const members = await getCollection("members");
+const publicationsByMember = buildMemberPublications(members, await getOrderedPublications());
 const byRole = (role: string) =>
   members
     .filter((m) => m.data.role === role)
@@ -36,7 +39,7 @@ const alumni = byRole("alumni");
       professor && ProfessorBio && (
         <section class="member-section" aria-labelledby="sec-professor">
           <h2 id="sec-professor" class="section-title">
-            Professor
+            {professor.data.facultyTitle}
           </h2>
 
           <article class="prof card" id={`member-${professor.id}`}>
@@ -62,7 +65,7 @@ const alumni = byRole("alumni");
                   {professor.data.name}
                 </button>
               </h3>
-              <p class="prof-role">Professor</p>
+              <p class="prof-role">{professor.data.facultyTitle}</p>
               {professor.data.major && (
                 <p class="prof-major">{professor.data.major}</p>
               )}
@@ -91,7 +94,7 @@ const alumni = byRole("alumni");
           <MemberDialog
             dialogId={`member-dialog-${professor.id}`}
             name={professor.data.name}
-            position="Professor"
+            position={professor.data.facultyTitle}
             major={professor.data.major}
             image={professor.data.image}
             variant="contact"
@@ -125,6 +128,7 @@ const alumni = byRole("alumni");
                 interests={member.data.interests}
                 currentResearch={member.data.currentResearch}
                 publications={member.data.publications}
+                linkedPublications={publicationsByMember.get(member.id)}
                 email={member.data.email}
                 links={member.data.links}
               />

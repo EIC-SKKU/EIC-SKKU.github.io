@@ -23,6 +23,8 @@ const members = defineCollection({
   schema: z.object({
     name: z.string(),
     role: z.enum(["professor", "phd", "msphd", "ms", "undergrad", "alumni"]),
+    /** professor's academic rank; separate from the member grouping */
+    facultyTitle: z.enum(["Assistant Professor", "Associate Professor", "Professor"]).default("Professor"),
     /** controls whether this active member appears in the private roulette */
     gameEligible: z.boolean().default(true),
     /** program/track note shown after the position, e.g. "SSIT" */
@@ -35,7 +37,7 @@ const members = defineCollection({
     interests: z.string().optional(),
     /** rough description of what they're working on right now */
     currentResearch: z.string().optional(),
-    /** free-form publication entries shown in the member pop-up */
+    /** additional free-form entries, alongside automatically matched papers */
     publications: z.array(z.string()).default([]),
     email: z.string().optional(),
     /** professor contact details shown in the contact pop-up */
@@ -46,6 +48,7 @@ const members = defineCollection({
         about: z.string().optional(),
         website: z.string().optional(),
         scholar: z.string().optional(),
+        linkedin: z.string().optional(),
         orcid: z.string().optional(),
         dblp: z.string().optional(),
         cv: z.string().optional(),
@@ -87,7 +90,11 @@ const publications = defineCollection({
         doi: z.string().optional(),
       })
       .default({}),
-    order: z.number().default(99),
+    /** 1 is oldest; omitted values receive the next number at build time. */
+    order: z.preprocess(
+      (value) => value === null || value === "" ? undefined : value,
+      z.coerce.number().int().positive().optional()
+    ),
   }),
 });
 

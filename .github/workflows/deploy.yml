@@ -21,7 +21,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
         with:
-          # full history — the home page sorts publications by git add date
+          # Full history supports automatic publication numbers and home-page recency.
           fetch-depth: 0
       - name: Install, build, and upload site
         uses: withastro/action@v6

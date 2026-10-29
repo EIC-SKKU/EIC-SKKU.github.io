@@ -1,6 +1,7 @@
 ---
 name: Yulhwa Kim
 role: professor
+facultyTitle: Assistant Professor
 image: /images/members/a.jpg
 email: yulhwakim@skku.edu
 phone: +82-31-299-4911

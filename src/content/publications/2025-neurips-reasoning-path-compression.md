@@ -8,5 +8,5 @@ year: 2025
 area: efficient-ai
 links:
   paper: https://arxiv.org/abs/2505.13866
-order: 6
+order: 29
 ---

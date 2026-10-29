@@ -53,10 +53,28 @@ tab.
   Use **Include in member roulette** to exclude an active member from the
   roulette without removing their public profile. Alumni never enter the
   roulette.
+- For a professor, choose **Faculty title**: Assistant Professor, Associate
+  Professor, or Professor. This changes the public title without changing the
+  member's role/group.
+- Student pop-ups automatically list papers whose author names match their
+  member names. Use **Additional publications** only for papers not already in
+  the Publications collection. Ambiguous duplicate names are not matched
+  automatically; their additional entries can be maintained manually.
+- A LinkedIn icon appears beside each student's name. Leave **Profile links →
+  LinkedIn** empty for the inactive placeholder, then add the full profile URL
+  when available.
 - Gallery images should be landscape 4:3. Aim for at least 1600 x 1200 pixels.
 - Prefer WebP or optimized JPEG files and keep individual images below 2 MB.
-- Use display order only to arrange entries within the same role, year, or
-  section. Lower numbers appear first.
+- Member and research display orders still put lower numbers first.
+- Publication order uses **1 for the oldest paper** and higher numbers for newer
+  papers. The site keeps newest years first, then higher order first within each
+  year/category. Existing papers have been numbered 1–36 in that direction.
+- Leave a new paper's **Publication order** empty to assign the next highest
+  number automatically at build time (currently 37). Multiple new papers are
+  ordered by when they were first added to Git; ties use stable filenames.
+  This computed value is not written back to the CMS field. If you need a fixed
+  number that will not shift when other entries are removed or explicitly
+  renumbered, enter it manually.
 - Feature only the strongest gallery images in the home page carousel.
 - Leave optional fields empty instead of entering placeholder text or `#`.
 - For Notes, fill in Title and Summary, then write the article in the prominent

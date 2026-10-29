@@ -6,7 +6,7 @@ venueShort: ICML
 venueType: conference
 year: "2026"
 area: efficient-ai
-order: 3
+order: 34
 abstract: >-
   Large language models (LLMs) demand substantial computational and memory
   resources, posing challenges for efficient deployment. Two complementary

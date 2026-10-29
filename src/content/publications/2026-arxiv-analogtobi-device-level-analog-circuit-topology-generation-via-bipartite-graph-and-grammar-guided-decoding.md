@@ -2,7 +2,7 @@
 title: "AnalogToBi: Device-Level Analog Circuit Topology Generation via
   Bipartite Graph and Grammar Guided Decoding"
 year: "2026"
-order: 1
+order: 36
 authors: Seungmin Kim, Mingun Kim, Yuna Lee, Yulhwa Kim⁺
 venue: Conference on Neural Information Processing Systems (NeurIPS)
 venueShort: NeurIPS

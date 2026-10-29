@@ -69,10 +69,19 @@ current: "Engineer, Samsung Electronics — Memory Division"
 ```
 
 The professor's Markdown body (below the frontmatter) is rendered as a short bio.
+Their `facultyTitle` can be `Assistant Professor`, `Associate Professor`, or
+`Professor`. Student pop-ups automatically include matching papers from the
+Publications collection; `publications` can contain additional free-form entries.
+Leave `links.linkedin` empty to show an inactive LinkedIn icon, then supply the
+full profile URL when available.
 
 ### Publications — `src/content/publications/`
 
-Grouped by `year` (newest first), sorted by `order` within a year.
+Grouped by `year` (newest first), sorted by descending `order` within a year.
+Order 1 is oldest; higher numbers are newer. Omit `order` for a new paper and the
+build assigns the next number above the existing maximum using Git addition
+history. Computed values stay out of the source files/CMS; an explicit number
+can be supplied when needed.
 
 ```yaml
 ---
@@ -86,7 +95,7 @@ links:               # all optional — omit any you don't have
   code: "#"
   project: "#"
   doi: "#"
-order: 1
+# order: 37         # optional; leave out for automatic numbering
 ---
 ```
 
