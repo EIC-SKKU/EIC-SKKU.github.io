@@ -4,7 +4,7 @@ title: "AnalogToBi: Device-Level Analog Circuit Topology Generation via
 year: "2026"
 order: 1
 authors: Seungmin Kim, Mingun Kim, Yuna Lee, Yulhwa Kim⁺
-venue: NeruIPS 2026
+venue: Conference on Neural Information Processing Systems (NeurIPS),  2026 (accepted)
 venueShort: NeurIPS
 preprint: false
 abstract: Analog circuit design remains highly dependent on expert knowledge due
