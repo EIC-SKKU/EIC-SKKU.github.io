@@ -2,6 +2,7 @@
 import { formatEmail, normalizeEmail } from "../lib/email";
 import type { CollectionEntry } from "astro:content";
 import LinkedInLink from "./LinkedInLink.astro";
+import MemberPortrait from "./MemberPortrait.astro";
 
 interface Props {
   name: string;
@@ -86,7 +87,7 @@ const publicationItems: PublicationSummary[] = [
     </button>
 
     <div class="dialog-head">
-      <img
+      <MemberPortrait
         class="dialog-photo"
         src={photo}
         alt=""
@@ -250,7 +251,6 @@ const publicationItems: PublicationSummary[] = [
     aspect-ratio: 1;
     height: auto;
     flex: none;
-    object-fit: cover;
     border-radius: var(--radius-sm);
   }
 

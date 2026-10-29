@@ -2,6 +2,7 @@
 import { getCollection, render } from "astro:content";
 import Base from "../../layouts/Base.astro";
 import MemberDialog from "../../components/MemberDialog.astro";
+import MemberPortrait from "../../components/MemberPortrait.astro";
 import { ROLE_LABELS } from "../../lib/roles";
 import { buildMemberPublications } from "../../lib/member-publications";
 import { getOrderedPublications } from "../../lib/publications";
@@ -69,7 +70,8 @@ const fmt = (date: Date) =>
               const member = author.member;
               const contents = (
                 <>
-                  <img
+                  <MemberPortrait
+                    class="author-portrait"
                     src={member?.image ?? "/images/members/placeholder.svg"}
                     alt=""
                     width="28"
@@ -228,12 +230,11 @@ const fmt = (date: Date) =>
     color: var(--accent-strong);
   }
 
-  .author-person img {
+  .author-portrait {
     width: 28px;
     height: 28px;
     flex: none;
     border-radius: 50%;
-    object-fit: cover;
     background: var(--surface-2);
   }
 

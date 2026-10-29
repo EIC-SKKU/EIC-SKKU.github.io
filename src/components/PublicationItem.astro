@@ -1,5 +1,6 @@
 ---
 import type { CollectionEntry } from "astro:content";
+import MemberPortrait from "./MemberPortrait.astro";
 import {
   isAuthorSeparator,
   normalizeAuthorName,
@@ -160,7 +161,8 @@ const linkLabels: Record<string, string> = {
                       class="author-avatar"
                       href={`/members/#member-${match.id}`}
                     >
-                      <img
+                      <MemberPortrait
+                        class="author-portrait"
                         src={match.image ?? "/images/members/placeholder.svg"}
                         alt=""
                         width="40"
@@ -178,7 +180,8 @@ const linkLabels: Record<string, string> = {
                       aria-haspopup="dialog"
                       aria-controls={`member-dialog-${match.id}`}
                     >
-                      <img
+                      <MemberPortrait
+                        class="author-portrait"
                         src={match.image ?? "/images/members/placeholder.svg"}
                         alt=""
                         width="40"
@@ -428,11 +431,10 @@ const linkLabels: Record<string, string> = {
     color: var(--accent-strong);
   }
 
-  .author-avatar img {
+  .author-portrait {
     width: 26px;
     height: 26px;
     border-radius: 50%;
-    object-fit: cover;
     flex: none;
   }
 

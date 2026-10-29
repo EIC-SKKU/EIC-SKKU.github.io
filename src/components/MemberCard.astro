@@ -1,6 +1,7 @@
 ---
 import MemberDialog from "./MemberDialog.astro";
 import LinkedInLink from "./LinkedInLink.astro";
+import MemberPortrait from "./MemberPortrait.astro";
 import type { CollectionEntry } from "astro:content";
 import { formatEmail, normalizeEmail } from "../lib/email";
 
@@ -61,7 +62,8 @@ const externalLinks = [
       aria-controls={dialogId}
       aria-label={`View ${name}'s profile and publications`}
     >
-      <img
+      <MemberPortrait
+        class="portrait"
         src={photo}
         alt={`Portrait of ${name}`}
         width="400"
@@ -177,15 +179,14 @@ const externalLinks = [
     outline-offset: -3px;
   }
 
-  .photo img {
+  .portrait {
     width: 100%;
     aspect-ratio: 1;
-    object-fit: cover;
     transition: filter 0.2s ease;
   }
 
-  .member-card:hover .photo-open img,
-  .member-card:focus-within .photo-open img {
+  .member-card:hover .portrait,
+  .member-card:focus-within .portrait {
     filter: brightness(0.86);
   }
 

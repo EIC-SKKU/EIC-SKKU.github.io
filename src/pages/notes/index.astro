@@ -2,6 +2,7 @@
 import { getCollection } from "astro:content";
 import Base from "../../layouts/Base.astro";
 import PageHeader from "../../components/PageHeader.astro";
+import MemberPortrait from "../../components/MemberPortrait.astro";
 import { ROLE_LABELS } from "../../lib/roles";
 import {
   buildMemberMaps,
@@ -89,7 +90,8 @@ const fmt = (date: Date) =>
                       <div class="authors" aria-label={`By ${authors.map((author) => author.name).join(", ")}`}>
                         {authors.map((author) => (
                           <span class="author">
-                            <img
+                            <MemberPortrait
+                              class="author-portrait"
                               src={author.member?.image ?? "/images/members/placeholder.svg"}
                               alt=""
                               width="24"
@@ -242,13 +244,12 @@ const fmt = (date: Date) =>
     min-width: 0;
   }
 
-  .author img {
+  .author-portrait {
     width: 24px;
     height: 24px;
     flex: none;
     border: 1px solid var(--line);
     border-radius: 50%;
-    object-fit: cover;
     background: var(--surface-2);
   }
 
