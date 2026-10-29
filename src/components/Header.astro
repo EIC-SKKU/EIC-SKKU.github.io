@@ -70,16 +70,14 @@ const isActive = (href: string) =>
         <li class="monitor-link">
           <span class="brand-divider nav-divider" aria-hidden="true"></span>
           <a
-            href="/gpu-monitor/"
+            href="http://115.145.209.141:9000/"
             target="_blank"
             rel="noopener noreferrer"
-            aria-current={isActive("/gpu-monitor/") ? "page" : undefined}
+            data-monitor-trigger
+            aria-haspopup="dialog"
+            aria-controls="gpu-monitor-dialog"
           >
-            <span class="monitor-label">
-              GPU Monitor
-              <span class="monitor-access">Members only</span>
-            </span>
-            <span class="visually-hidden"> (opens in a new tab)</span>
+            GPU Monitor
           </a>
         </li>
       </ul>
@@ -110,6 +108,32 @@ const isActive = (href: string) =>
     </button>
   </div>
 </header>
+
+<dialog
+  id="gpu-monitor-dialog"
+  class="monitor-dialog"
+  aria-labelledby="gpu-monitor-title"
+  aria-describedby="gpu-monitor-description"
+>
+  <div class="monitor-dialog-body">
+    <h2 id="gpu-monitor-title">Members only</h2>
+    <p id="gpu-monitor-description">
+      Please connect to SKKU VPN to access GPU Monitor.
+    </p>
+    <div class="monitor-dialog-actions">
+      <button class="btn btn-ghost" type="button" data-close autofocus>Cancel</button>
+      <a
+        class="btn btn-primary"
+        href="http://115.145.209.141:9000/"
+        target="_blank"
+        rel="noopener noreferrer"
+        data-monitor-continue
+      >
+        Open GPU Monitor<span class="visually-hidden"> (opens in a new tab)</span>
+      </a>
+    </div>
+  </div>
+</dialog>
 
 <style>
   .site-header {
@@ -198,21 +222,6 @@ const isActive = (href: string) =>
     align-self: center;
   }
 
-  .monitor-label {
-    position: relative;
-  }
-
-  .monitor-access {
-    position: absolute;
-    top: calc(100% + 1px);
-    left: 50%;
-    transform: translateX(-50%);
-    font-size: 10px;
-    font-weight: 400;
-    line-height: 1.2;
-    color: var(--ink-2);
-  }
-
   .site-nav a {
     position: relative;
     display: inline-flex;
@@ -278,6 +287,43 @@ const isActive = (href: string) =>
     display: block;
   }
 
+  .monitor-dialog {
+    width: min(440px, calc(100vw - 2rem));
+    max-height: calc(100dvh - 2rem);
+    padding: 0;
+    overflow-y: auto;
+    border: none;
+    border-radius: var(--radius);
+    background: var(--surface);
+    color: var(--ink);
+    box-shadow: 0 24px 60px rgb(15 20 30 / 0.25);
+  }
+
+  .monitor-dialog::backdrop {
+    background: rgba(20, 24, 31, 0.55);
+  }
+
+  .monitor-dialog-body {
+    padding: clamp(1.4rem, 3vw, 1.9rem);
+  }
+
+  .monitor-dialog h2 {
+    font-size: 1.4rem;
+  }
+
+  .monitor-dialog p {
+    margin-top: 0.8rem;
+    color: var(--ink-2);
+  }
+
+  .monitor-dialog-actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 0.65rem;
+    margin-top: 1.5rem;
+  }
+
   @media (max-width: 1080px) {
     .nav-toggle {
       display: inline-flex;
@@ -314,18 +360,6 @@ const isActive = (href: string) =>
 
     .nav-divider {
       display: none;
-    }
-
-    .monitor-label {
-      display: flex;
-      flex-direction: column;
-      align-items: flex-start;
-      gap: 2px;
-    }
-
-    .monitor-access {
-      position: static;
-      transform: none;
     }
 
     .site-nav a {
@@ -370,4 +404,20 @@ const isActive = (href: string) =>
     const open = header?.toggleAttribute("data-nav-open");
     toggle.setAttribute("aria-expanded", open ? "true" : "false");
   });
+
+  const monitorTrigger = document.querySelector<HTMLAnchorElement>("[data-monitor-trigger]");
+  const monitorDialog = document.querySelector<HTMLDialogElement>("#gpu-monitor-dialog");
+
+  if (monitorTrigger && monitorDialog && typeof monitorDialog.showModal === "function") {
+    monitorTrigger.addEventListener("click", (event) => {
+      // Preserve the direct link for modified clicks and JavaScript-free access.
+      if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+      event.preventDefault();
+      monitorDialog.showModal();
+    });
+
+    monitorDialog.querySelector("[data-monitor-continue]")?.addEventListener("click", () => {
+      monitorDialog.close();
+    });
+  }
 </script>
