@@ -1,7 +1,7 @@
 ---
 name: Mingun Kim
-role: undergrad
-order: 2
+role: ms
+order: 10
 gameEligible: true
 labLead: false
 major: Department of Electrical and Computer Engineering
