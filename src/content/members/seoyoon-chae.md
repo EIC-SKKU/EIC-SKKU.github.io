@@ -1,7 +1,7 @@
 ---
 name: Seoyoon Chae
-role: undergrad
-order: 1
+role: ms
+order: 9
 gameEligible: true
 labLead: false
 major: Department of Electronic and Electrical Engineering
