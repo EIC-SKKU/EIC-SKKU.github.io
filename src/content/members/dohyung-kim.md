@@ -9,4 +9,6 @@ major: Department of Semiconductor and Display Engineering
 interests: PIM, AI accelerator
 currentResearch: AI hardware accelerator architecture
 email: kdppk3_at_gmail.com
+links:
+  linkedin: https://www.linkedin.com/in/dohyeong-kim-785bb4447/
 ---

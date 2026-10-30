@@ -12,4 +12,5 @@ email: kyohmin_at_skku_dot_edu
 links:
   website: https://kyounghomin.com
   linkedin: https://www.linkedin.com/in/kyounghomin/
+  scholar: https://scholar.google.com/citations?hl=en&user=njtBKcsAAAAJ
 ---

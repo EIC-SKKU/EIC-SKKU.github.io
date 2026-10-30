@@ -4,6 +4,7 @@ role: ms
 labLead: true
 email: seungmin.kim_at_skku.edu
 links:
+  linkedin: https://www.linkedin.com/in/smk773330
   scholar: https://scholar.google.com/citations?hl=ko&user=64514u4AAAAJ
 order: 3
 gameEligible: true
