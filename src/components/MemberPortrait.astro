@@ -14,8 +14,9 @@ const {
   ...attributes
 } = Astro.props;
 
-// Keep framing tied to this photograph so future replacements use their own crop.
+// Keep framing tied to each photograph so replacements use their own crop.
 const closerPortrait = src === "/images/members/jinheon-choi.jpg";
+const seongjunPortrait = src === "/images/members/seongjun-park.png";
 ---
 
 <span {...attributes} class:list={["member-portrait", className]}>
@@ -26,7 +27,7 @@ const closerPortrait = src === "/images/members/jinheon-choi.jpg";
     height={height}
     loading={loading}
     decoding={decoding}
-    class:list={{ "closer-portrait": closerPortrait }}
+    class:list={{ "closer-portrait": closerPortrait, "seongjun-portrait": seongjunPortrait }}
   />
 </span>
 
@@ -50,5 +51,10 @@ const closerPortrait = src === "/images/members/jinheon-choi.jpg";
   .closer-portrait {
     transform: scale(1.85);
     transform-origin: left 65%;
+  }
+
+  .seongjun-portrait {
+    transform: scale(1.35);
+    transform-origin: 40% 70%;
   }
 </style>
