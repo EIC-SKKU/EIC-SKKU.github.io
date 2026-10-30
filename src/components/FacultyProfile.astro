@@ -152,11 +152,12 @@ const { dialogId, name, position, major, image, interests, education, experience
 
   .faculty-email {
     max-width: 100%;
-    overflow-wrap: anywhere;
+    white-space: nowrap;
+    overflow-wrap: normal;
   }
 
   .faculty-email span {
-    min-width: 0;
+    flex: none;
   }
 
   .faculty-sections {
@@ -185,6 +186,11 @@ const { dialogId, name, position, major, image, interests, education, experience
 
   .faculty-interests {
     color: var(--ink);
+  }
+
+  .faculty-interests,
+  .academic-list {
+    margin-inline-start: clamp(0.6rem, 2vw, 1rem);
   }
 
   .academic-list {

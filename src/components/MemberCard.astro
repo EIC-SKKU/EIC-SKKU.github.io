@@ -414,11 +414,11 @@ const externalLinks = [
     z-index: 1;
     display: inline-flex;
     align-items: center;
-    gap: 0.4rem;
+    gap: 0.25rem;
     align-self: center;
     max-width: 100%;
     margin-top: auto;
-    padding: 0.34rem 0.75rem;
+    padding: 0.34rem 0.45rem;
     border: 1px solid var(--line);
     border-radius: 999px;
     background: var(--surface);
@@ -427,7 +427,8 @@ const externalLinks = [
     font-weight: 500;
     color: var(--ink-2);
     line-height: 1.2;
-    overflow-wrap: anywhere;
+    white-space: nowrap;
+    overflow-wrap: normal;
     transition: border-color 0.15s ease, color 0.15s ease,
       background-color 0.15s ease;
   }
@@ -439,6 +440,6 @@ const externalLinks = [
   }
 
   .email span {
-    min-width: 0;
+    flex: none;
   }
 </style>

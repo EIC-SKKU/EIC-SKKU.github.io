@@ -300,7 +300,8 @@ const alumni = byRole("alumni");
   /* ---- student grid ---- */
   .member-grid {
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
+    /* Keep complete email labels readable before adding another column. */
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 266px), 1fr));
     gap: 1.15rem;
   }
 
@@ -345,17 +346,7 @@ const alumni = byRole("alumni");
   }
 
   /* ---- responsive ---- */
-  @media (max-width: 1080px) {
-    .member-grid {
-      grid-template-columns: repeat(3, 1fr);
-    }
-  }
-
   @media (max-width: 860px) {
-    .member-grid {
-      grid-template-columns: repeat(2, 1fr);
-    }
-
     .prof {
       grid-template-columns: 1fr;
     }
@@ -366,9 +357,4 @@ const alumni = byRole("alumni");
     }
   }
 
-  @media (max-width: 480px) {
-    .member-grid {
-      grid-template-columns: 1fr;
-    }
-  }
 </style>

@@ -343,7 +343,8 @@ const publicationItems: PublicationSummary[] = [
     font-size: 0.82rem;
     color: var(--accent);
     max-width: 100%;
-    overflow-wrap: anywhere;
+    white-space: nowrap;
+    overflow-wrap: normal;
   }
 
   .email-link:hover {
@@ -353,7 +354,7 @@ const publicationItems: PublicationSummary[] = [
   }
 
   .email-link span {
-    min-width: 0;
+    flex: none;
   }
 
   .profile-publications {
