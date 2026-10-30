@@ -25,7 +25,9 @@ repository access when someone no longer manages lab content.
 
 ## Publishing workflow
 
-1. Open <https://eic-skku.github.io/admin/>.
+1. After the domain switch, open <https://eic.skku.edu/admin/>. During the
+   transition, open <https://app.pagescms.org/> directly and select
+   `EIC-SKKU/EIC-SKKU.github.io`.
 2. Enter the relevant collection and create or edit an item.
 3. Review required fields, image selection, date, and display order.
 4. Save the entry.

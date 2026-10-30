@@ -1,6 +1,6 @@
 # EIC Lab Website
 
-The official website of **EIC Lab** (Efficient & Intelligent Computing Laboratory) at Sungkyunkwan University, built with [Astro](https://astro.build) and deployed to GitHub Pages at [eic-skku.github.io](https://eic-skku.github.io).
+The official website of **EIC Lab** (Efficient & Intelligent Computing Laboratory) at Sungkyunkwan University, built with [Astro](https://astro.build) and deployed to GitHub Pages. The production domain is configured as [eic.skku.edu](https://eic.skku.edu); the external domain setup is described in [`docs/DOMAIN.md`](docs/DOMAIN.md).
 
 ## Commands
 
@@ -14,10 +14,13 @@ The official website of **EIC Lab** (Efficient & Intelligent Computing Laborator
 ## Editing content
 
 Pages CMS provides the visual content editor. Open
-[`eic-skku.github.io/admin/`](https://eic-skku.github.io/admin/) and use an
+[`eic.skku.edu/admin/`](https://eic.skku.edu/admin/) after the domain switch and use an
 authorized GitHub account. The editor is configured by `.pages.yml`; setup,
 publishing, media, access, and recovery instructions are in
 [`docs/CMS.md`](docs/CMS.md).
+
+During the domain transition, editors can open [Pages CMS](https://app.pagescms.org/)
+directly and select the `EIC-SKKU/EIC-SKKU.github.io` repository.
 
 All site content remains in `src/content/` as plain Markdown files with
 frontmatter, one file per item. To edit manually, add, update, or remove the
@@ -152,4 +155,13 @@ Placeholder details to update when known: footer/contact email, phone, and room 
 
 Pushing to `main` triggers `.github/workflows/deploy.yml`, which builds the site and deploys it to GitHub Pages.
 
-**One-time setup:** in the GitHub repo, go to *Settings → Pages* and set **Source** to **GitHub Actions**. No custom domain is configured yet, so the site serves from the default `eic-skku.github.io` URL. To add one later, create `public/CNAME` with the domain and update `site` in `astro.config.mjs` to match.
+**Domain setup:** keep *Settings → Pages → Source* set to **GitHub Actions**.
+At the scheduled switch, set **Custom domain** to `eic.skku.edu`, then have the
+SKKU DNS administrator replace its existing Google Sites CNAME with
+`eic-skku.github.io`. Enable **Enforce HTTPS** once GitHub's certificate is ready.
+See [`docs/DOMAIN.md`](docs/DOMAIN.md) for the exact records and handover steps.
+
+The Astro `site` setting drives canonical URLs, social metadata, the sitemap,
+and RSS links. `public/robots.txt` points to the same domain. This Actions
+deployment does not use a `CNAME` file; the domain is configured in GitHub's
+repository settings.

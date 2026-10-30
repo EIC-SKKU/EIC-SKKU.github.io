@@ -4,6 +4,6 @@ import sitemap from "@astrojs/sitemap";
 
 // https://astro.build/config
 export default defineConfig({
-  site: "https://eic-skku.github.io",
+  site: "https://eic.skku.edu",
   integrations: [sitemap({ filter: (page) => !page.endsWith("/game/") })],
 });
