@@ -1,6 +1,6 @@
 ---
 import MemberDialog from "./MemberDialog.astro";
-import LinkedInLink from "./LinkedInLink.astro";
+import MemberSocialLinks from "./MemberSocialLinks.astro";
 import MemberPortrait from "./MemberPortrait.astro";
 import type { CollectionEntry } from "astro:content";
 import { formatEmail, normalizeEmail } from "../lib/email";
@@ -48,7 +48,6 @@ const anchorId = `member-${memberId}`;
 
 const externalLinks = [
   { label: "Website", href: links.website },
-  { label: "Scholar", href: links.scholar },
 ].filter((item) => item.href);
 ---
 
@@ -123,7 +122,7 @@ const externalLinks = [
           {name}
         </button>
       </h3>
-      <LinkedInLink name={name} url={links.linkedin} />
+      <MemberSocialLinks name={name} linkedin={links.linkedin} scholar={links.scholar} />
     </div>
     <p class="position">{position}{track && ` · ${track}`}</p>
     {interests && <p class="interests">{interests}</p>}
@@ -286,8 +285,7 @@ const externalLinks = [
     color: var(--accent-strong);
   }
 
-  /* card too narrow for About + Website + Scholar on one line — shrink
-     instead of letting them wrap to a second row */
+  /* Keep photo actions compact on narrow cards. */
   @container (max-width: 260px) {
     .photo-links {
       gap: 0.25rem;
@@ -346,18 +344,22 @@ const externalLinks = [
 
   .member-name-row {
     display: flex;
-    align-items: flex-start;
-    gap: 0.4rem;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.25rem 0.4rem;
     width: 100%;
   }
 
   h3 {
-    flex: 1;
+    flex: 1 1 auto;
     min-width: 0;
+    max-width: 100%;
+    overflow-wrap: anywhere;
     font-size: 1.15rem;
   }
 
   .open {
+    max-width: 100%;
     font: inherit;
     letter-spacing: inherit;
     text-align: left;

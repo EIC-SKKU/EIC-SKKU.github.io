@@ -1,7 +1,7 @@
 ---
 import { formatEmail, normalizeEmail } from "../lib/email";
 import type { CollectionEntry } from "astro:content";
-import LinkedInLink from "./LinkedInLink.astro";
+import MemberSocialLinks from "./MemberSocialLinks.astro";
 import MemberPortrait from "./MemberPortrait.astro";
 
 interface Props {
@@ -52,7 +52,6 @@ const photo = image ?? "/images/members/placeholder.svg";
 
 const externalLinks = [
   { label: "Website", href: links.website },
-  { label: "Scholar", href: links.scholar },
 ].filter((item) => item.href);
 
 interface PublicationSummary {
@@ -105,7 +104,7 @@ const publicationItems: PublicationSummary[] = [
       <div class="dialog-title">
         <div class="dialog-name-row">
           <h3>{name}</h3>
-          {variant === "profile" && <LinkedInLink name={name} url={links.linkedin} />}
+          <MemberSocialLinks name={name} linkedin={links.linkedin} scholar={links.scholar} />
         </div>
         <p class="position">{position}{track && ` · ${track}`}</p>
         {major && <p class="major">{major}</p>}
@@ -324,13 +323,15 @@ const publicationItems: PublicationSummary[] = [
   .dialog-name-row {
     display: flex;
     flex-wrap: wrap;
-    align-items: flex-start;
-    gap: 0.4rem;
+    align-items: center;
+    gap: 0.25rem 0.4rem;
   }
 
   .dialog-title h3 {
-    flex: 1 1 8rem;
+    flex: 1 1 auto;
     min-width: 0;
+    max-width: 100%;
+    overflow-wrap: anywhere;
     font-size: 1.4rem;
   }
 
@@ -551,6 +552,16 @@ const publicationItems: PublicationSummary[] = [
   }
 
   @media (max-width: 520px) {
+    .dialog-head {
+      flex-direction: column;
+      align-items: stretch;
+      gap: 0.85rem;
+    }
+
+    .dialog-title {
+      padding-right: 0;
+    }
+
     .dialog-photo {
       width: 84px;
     }

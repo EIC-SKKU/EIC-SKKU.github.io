@@ -4,6 +4,7 @@ import Base from "../layouts/Base.astro";
 import PageHeader from "../components/PageHeader.astro";
 import MemberCard from "../components/MemberCard.astro";
 import MemberDialog from "../components/MemberDialog.astro";
+import MemberSocialLinks from "../components/MemberSocialLinks.astro";
 import { ROLE_LABELS } from "../lib/roles";
 import { formatEmail, normalizeEmail } from "../lib/email";
 import { buildMemberPublications } from "../lib/member-publications";
@@ -53,18 +54,25 @@ const alumni = byRole("alumni");
               decoding="async"
             />
             <div class="prof-body">
-              <h3>
-                <button
-                  class="prof-open"
-                  type="button"
-                  data-open
-                  aria-haspopup="dialog"
-                  aria-controls={`member-dialog-${professor.id}`}
-                  aria-label={`About ${professor.data.name}`}
-                >
-                  {professor.data.name}
-                </button>
-              </h3>
+              <div class="prof-name-row">
+                <h3>
+                  <button
+                    class="prof-open"
+                    type="button"
+                    data-open
+                    aria-haspopup="dialog"
+                    aria-controls={`member-dialog-${professor.id}`}
+                    aria-label={`About ${professor.data.name}`}
+                  >
+                    {professor.data.name}
+                  </button>
+                </h3>
+                <MemberSocialLinks
+                  name={professor.data.name}
+                  linkedin={professor.data.links.linkedin}
+                  scholar={professor.data.links.scholar}
+                />
+              </div>
               <p class="prof-role">{professor.data.facultyTitle}</p>
               {professor.data.major && (
                 <p class="prof-major">{professor.data.major}</p>
@@ -78,16 +86,9 @@ const alumni = byRole("alumni");
                     {formatEmail(professor.data.email)}
                   </a>
                 )}
-                {[
-                  ["Google Scholar", professor.data.links.scholar],
-                  ["Website", professor.data.links.website],
-                ]
-                  .filter(([, href]) => href)
-                  .map(([label, href]) => (
-                    <a class="chip" href={href}>
-                      {label}
-                    </a>
-                  ))}
+                {professor.data.links.website && (
+                  <a class="chip" href={professor.data.links.website}>Website</a>
+                )}
               </div>
             </div>
           </article>
@@ -249,12 +250,23 @@ const alumni = byRole("alumni");
   }
 
   .prof-body {
+    min-width: 0;
     padding: clamp(1.4rem, 3vw, 2rem);
     align-self: center;
   }
 
   .prof-body h3 {
+    min-width: 0;
+    max-width: 100%;
+    overflow-wrap: anywhere;
     font-size: 1.7rem;
+  }
+
+  .prof-name-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.25rem 0.5rem;
   }
 
   .prof-role {

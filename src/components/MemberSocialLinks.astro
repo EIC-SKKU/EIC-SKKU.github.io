@@ -1,0 +1,80 @@
+---
+interface Props {
+  name: string;
+  linkedin?: string;
+  scholar?: string;
+}
+
+const { name, linkedin, scholar } = Astro.props;
+const profiles = [
+  {
+    service: "LinkedIn",
+    className: "linkedin",
+    href: linkedin?.trim(),
+    path: "M20.45 2H3.55A1.55 1.55 0 0 0 2 3.55v16.9A1.55 1.55 0 0 0 3.55 22h16.9A1.55 1.55 0 0 0 22 20.45V3.55A1.55 1.55 0 0 0 20.45 2ZM7.93 18.75H4.98V9.2h2.95ZM6.46 7.9a1.71 1.71 0 1 1 0-3.42 1.71 1.71 0 0 1 0 3.42Zm12.29 10.85H15.8V14.1c0-1.11-.02-2.53-1.54-2.53-1.54 0-1.78 1.2-1.78 2.45v4.73H9.53V9.2h2.83v1.3h.04a3.1 3.1 0 0 1 2.79-1.53c2.98 0 3.56 1.97 3.56 4.53Z",
+  },
+  {
+    service: "Google Scholar",
+    className: "scholar",
+    href: scholar?.trim(),
+    path: "M12 24a7 7 0 1 0 0-14 7 7 0 0 0 0 14Zm0-24L0 9.5l4.875 3.875C6.154 10.74 8.866 9 12 9s5.846 1.74 7.125 4.375L24 9.5 12 0Z",
+  },
+].filter((profile) => profile.href);
+---
+
+{profiles.length > 0 && (
+  <span class="member-social-links" role="group" aria-label={`Profiles for ${name}`}>
+    {profiles.map((profile) => (
+      <a
+        class:list={["profile-link", profile.className]}
+        href={profile.href}
+        target="_blank"
+        rel="noopener noreferrer"
+        aria-label={`${name} on ${profile.service} (opens in a new tab)`}
+        title={profile.service}
+      >
+        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+          <path d={profile.path} />
+        </svg>
+      </a>
+    ))}
+  </span>
+)}
+
+<style>
+  /* Keep the icons together when the name row wraps. */
+  .member-social-links {
+    display: inline-flex;
+    align-items: center;
+    flex: none;
+    gap: 2px;
+  }
+
+  .profile-link {
+    position: relative;
+    z-index: 1;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: none;
+    width: 28px;
+    height: 28px;
+    border-radius: 5px;
+    color: var(--accent);
+  }
+
+  .profile-link svg {
+    width: 18px;
+    height: 18px;
+  }
+
+  .profile-link:hover,
+  .profile-link:focus-visible {
+    background: var(--accent-tint);
+  }
+
+  .profile-link:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
+</style>
