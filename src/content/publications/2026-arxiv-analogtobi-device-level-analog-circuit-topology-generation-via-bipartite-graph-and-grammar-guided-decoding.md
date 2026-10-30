@@ -22,7 +22,7 @@ abstract: Analog circuit design remains highly dependent on expert knowledge due
   validity and novelty without HITL training while effectively avoiding
   memorization of training topologies. Our code is available at
   https://github.com/Seungmin0825/AnalogToBi.
-image: /images/publications/image-3.png
+image: /images/publications/image-3.webp
 links:
   paper: https://arxiv.org/abs/2603.08720
   code: https://github.com/Seungmin0825/AnalogToBi

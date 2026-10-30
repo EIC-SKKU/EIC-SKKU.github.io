@@ -5,5 +5,5 @@ track: SSIT
 order: 2
 gameEligible: true
 labLead: false
-image: /images/members/f.jpg
+image: /images/members/f.webp
 ---

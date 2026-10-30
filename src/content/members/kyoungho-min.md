@@ -7,7 +7,7 @@ order: 3
 gameEligible: true
 labLead: false
 major: Department of Electrical and Computer Engineering
-image: /images/members/kyoungho-min.png
+image: /images/members/kyoungho-min.webp
 email: kyohmin_at_skku_dot_edu
 links:
   linkedin: https://www.linkedin.com/in/kyounghomin/

@@ -31,7 +31,7 @@ abstract: >-
   CommonsenseQA benchmarks. By combining token-adaptive execution for FLOPs
   reduction and quantization for memory savings, QTALE provides an effective
   solution for efficient LLM deployment.
-image: /images/publications/imgjuly-21-42.png
+image: /images/publications/imgjuly-21-42.webp
 preprint: false
 links:
   paper: https://arxiv.org/abs/2602.10431

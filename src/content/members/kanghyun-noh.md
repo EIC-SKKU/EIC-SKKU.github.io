@@ -12,5 +12,5 @@ order: 1
 gameEligible: true
 labLead: false
 major: Department of Semiconductor Convergence Engineering
-image: /images/members/A8624A9A-8E01-442B-9E01-E065FF2BFAD4_1_105_c.jpeg
+image: /images/members/A8624A9A-8E01-442B-9E01-E065FF2BFAD4_1_105_c.webp
 ---

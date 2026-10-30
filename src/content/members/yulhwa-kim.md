@@ -23,7 +23,7 @@ experience:
   - period: Jun. 2019 – Aug. 2019
     position: Research Intern
     organization: IBM T.J. Watson Research Center
-image: /images/members/a.jpg
+image: /images/members/a.webp
 email: yulhwakim@skku.edu
 phone: +82-31-299-4911
 office: "Room #400306, Semiconductor building"

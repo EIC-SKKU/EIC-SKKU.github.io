@@ -11,5 +11,5 @@ email: sychaeee_at_skku.edu
 links:
   linkedin: https://www.linkedin.com/in/seoyoon-chae-105400334/
   scholar: https://scholar.google.com/citations?user=EUDRNREAAAAJ&hl=en&oi=ao
-image: /images/members/profile.jpg
+image: /images/members/profile.webp
 ---

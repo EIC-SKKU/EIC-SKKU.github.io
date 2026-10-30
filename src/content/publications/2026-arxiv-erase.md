@@ -22,7 +22,7 @@ abstract: Recent advancements in Vision-Language Models (VLMs) enable large
   vision tokens while preserving accuracy. For Qwen2.5-VL-7B, at a token pruning
   ratio of 85%, ERASE retains 89.46% of the original model accuracy, whereas the
   best prior method retains only 78.1%.
-image: /images/publications/imgjuly-21-54.png
+image: /images/publications/imgjuly-21-54.webp
 links:
   paper: https://arxiv.org/abs/2605.09982
   code: https://github.com/Tuna-Luna/ERASE

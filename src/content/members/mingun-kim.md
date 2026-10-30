@@ -10,5 +10,5 @@ currentResearch: Digital design automation, Agentic RTL verification
 email: mingun.kim_at_skku.edu
 links:
   linkedin: https://www.linkedin.com/in/mingun-kim-722875371/
-image: /images/members/IMG_4661.jpg
+image: /images/members/IMG_4661.webp
 ---
