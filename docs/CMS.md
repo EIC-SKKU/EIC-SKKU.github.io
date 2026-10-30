@@ -54,9 +54,10 @@ tab.
   explicitly instead of relying on unsupported conditional settings.
 - News summaries should be one or two concise sentences.
 - For enrollment announcements, use the confirmed term's first day in **News
-  date** and choose **Show date as → Month and year**. The first day is used
-  only to sort entries; visitors see, for example, **March 2026**, with no
-  implied enrollment day. Keep **Full date** for news with a known exact date.
+  date** and choose **Show date as → Month only**. The first day is used only
+  to sort entries. The News page shows **March** under its year heading; the
+  homepage includes the year, such as **March 2026**, for context. Keep
+  **Full date** for news with a known exact date.
 - News can include an optional full story and up to 10 slideshow images. Add
   slideshow images through the News images field; their selected order is their
   display order in the pop-up.

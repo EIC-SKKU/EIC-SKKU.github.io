@@ -112,7 +112,7 @@ content:
         label: News date
         type: date
         required: true
-        description: For enrollment news, use the first day of the confirmed March or September term, then select Month and year below.
+        description: For enrollment news, use the first day of the confirmed March or September term, then select Month only below.
         options:
           format: yyyy-MM-dd
       - name: datePrecision
@@ -124,7 +124,7 @@ content:
             - name: day
               label: Full date
             - name: month
-              label: Month and year
+              label: Month only
       - name: description
         label: Summary
         type: text

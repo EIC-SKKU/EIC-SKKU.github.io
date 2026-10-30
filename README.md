@@ -47,9 +47,10 @@ description above.
 ```
 
 For welcome news, use the confirmed enrollment term (for example,
-`date: 2026-03-01`) and add `datePrecision: month`. Both the home and news pages
-show **March 2026**; the stored first day is only for sorting. Other news keeps
-its full date by default. The CMS exposes this as **Show date as**.
+`date: 2026-03-01`) and add `datePrecision: month`. The News page shows **March**
+under its year heading, while the homepage shows **March 2026**. The stored
+first day is only for sorting. Other news keeps its full date by default. The
+CMS exposes this as **Show date as**.
 
 ### Members — `src/content/members/`
 

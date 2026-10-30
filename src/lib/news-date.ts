@@ -9,7 +9,7 @@ export function formatNewsDate({ date, datePrecision }: NewsDate, includeYear = 
     timeZone: "UTC",
     month: monthOnly ? "long" : "short",
     ...(!monthOnly && { day: "numeric" }),
-    ...((monthOnly || includeYear) && { year: "numeric" }),
+    ...(includeYear && { year: "numeric" }),
   });
 }
 
