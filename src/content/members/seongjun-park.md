@@ -10,5 +10,5 @@ order: 2
 gameEligible: true
 labLead: false
 major: Department of Electrical and Computer Engineering
-image: /images/members/d.jpg
+image: /images/members/seongjun-park.png
 ---
