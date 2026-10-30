@@ -2,6 +2,7 @@
 import { getCollection } from "astro:content";
 import Base from "../layouts/Base.astro";
 import Carousel from "../components/Carousel.astro";
+import { formatNewsDate, newsDateTime } from "../lib/news-date";
 import { getOrderedPublications, comparePublicationsNewestFirst, publicationAddedAt } from "../lib/publications";
 
 const news = (await getCollection("news"))
@@ -68,9 +69,9 @@ const slides = featured.map((item) => ({
               <li class="news-item">
                 <time
                   class="mono"
-                  datetime={item.data.date.toISOString().slice(0, 10)}
+                  datetime={newsDateTime(item.data)}
                 >
-                  {fmt(item.data.date)}
+                  {formatNewsDate(item.data)}
                 </time>
                 <div>
                   <h3>{item.data.title}</h3>
@@ -280,7 +281,7 @@ const slides = featured.map((item) => ({
 
   @media (max-width: 860px) {
     .main-grid {
-      grid-template-columns: 1fr;
+      grid-template-columns: minmax(0, 1fr);
       grid-template-rows: none;
     }
 

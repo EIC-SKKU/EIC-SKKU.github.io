@@ -46,6 +46,11 @@ Optional full story written in Markdown. If omitted, the pop-up uses the
 description above.
 ```
 
+For welcome news, use the confirmed enrollment term (for example,
+`date: 2026-03-01`) and add `datePrecision: month`. Both the home and news pages
+show **March 2026**; the stored first day is only for sorting. Other news keeps
+its full date by default. The CMS exposes this as **Show date as**.
+
 ### Members — `src/content/members/`
 
 ```yaml

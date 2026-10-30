@@ -2,6 +2,7 @@
 import { getCollection, render } from "astro:content";
 import Base from "../layouts/Base.astro";
 import PageHeader from "../components/PageHeader.astro";
+import { formatNewsDate, newsDateTime } from "../lib/news-date";
 
 const news = (await getCollection("news")).sort(
   (a, b) => b.data.date.valueOf() - a.data.date.valueOf()
@@ -15,13 +16,10 @@ const posts = await Promise.all(
   }))
 );
 
-const years = [...new Set(posts.map(({ item }) => item.data.date.getFullYear()))];
+const years = [...new Set(posts.map(({ item }) => item.data.date.getUTCFullYear()))];
 
 const postsIn = (year: number) =>
-  posts.filter(({ item }) => item.data.date.getFullYear() === year);
-
-const fmtDay = (date: Date) =>
-  date.toLocaleDateString("en-US", { month: "short", day: "numeric" });
+  posts.filter(({ item }) => item.data.date.getUTCFullYear() === year);
 ---
 
 <Base title="News">
@@ -58,11 +56,14 @@ const fmtDay = (date: Date) =>
             <div class="entries">
               {postsIn(year).map(({ item, Content, hasBody }) => (
                 <article class="entry" id={`post-${item.id}`}>
+                  {item.data.legacyIds.map((id) => (
+                    <span class="legacy-anchor" id={`post-${id}`} aria-hidden="true" />
+                  ))}
                   <time
                     class="entry-date mono"
-                    datetime={item.data.date.toISOString().slice(0, 10)}
+                    datetime={newsDateTime(item.data)}
                   >
-                    {fmtDay(item.data.date)}
+                    {formatNewsDate(item.data, false)}
                   </time>
                   <div class="entry-body">
                     <h3>{item.data.title}</h3>
@@ -157,10 +158,17 @@ const fmtDay = (date: Date) =>
   }
 
   .entry {
+    position: relative;
     display: grid;
-    grid-template-columns: 84px 1fr;
+    grid-template-columns: 8.25rem minmax(0, 1fr);
     gap: 1.25rem;
     padding-block: clamp(1.4rem, 3vw, 1.9rem);
+    scroll-margin-top: 135px;
+  }
+
+  .legacy-anchor {
+    position: absolute;
+    top: 0;
     scroll-margin-top: 135px;
   }
 

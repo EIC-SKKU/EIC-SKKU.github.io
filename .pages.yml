@@ -109,11 +109,22 @@ content:
         options:
           maxlength: 120
       - name: date
-        label: Publication date
+        label: News date
         type: date
         required: true
+        description: For enrollment news, use the first day of the confirmed March or September term, then select Month and year below.
         options:
           format: yyyy-MM-dd
+      - name: datePrecision
+        label: Show date as
+        type: select
+        default: day
+        options:
+          values:
+            - name: day
+              label: Full date
+            - name: month
+              label: Month and year
       - name: description
         label: Summary
         type: text

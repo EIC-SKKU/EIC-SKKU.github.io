@@ -13,6 +13,10 @@ const news = defineCollection({
   schema: z.object({
     title: z.string(),
     date: z.coerce.date(),
+    /** Month-only events use the first day for sorting, without displaying a day. */
+    datePrecision: z.enum(["day", "month"]).default("day"),
+    /** Retain anchors for welcome announcements merged into an enrollment cohort. */
+    legacyIds: z.array(z.string()).default([]),
     description: z.string(),
     images: z.array(z.string()).default([]),
   }),

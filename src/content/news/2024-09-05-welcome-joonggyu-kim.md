@@ -1,5 +1,6 @@
 ---
-title: Welcome, Joonggyu Kim and Soonwon Jeong!
-date: 2024-09-05
-description: Please welcome Joonggyu Kim and Soonwon Jeong, our newest EIC Lab members!
+title: Welcome, Joonggyu Kim, Soonwon Jeong, Kyoungho Min, and Seongjun Park!
+date: 2025-03-01
+datePrecision: month
+description: Please welcome Joonggyu Kim, Soonwon Jeong, Kyoungho Min, and Seongjun Park, who joined EIC Lab in March 2025!
 ---

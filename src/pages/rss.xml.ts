@@ -15,7 +15,8 @@ export async function GET(context: APIContext) {
     items: news.map((item) => ({
       title: item.data.title,
       description: item.data.description,
-      pubDate: item.data.date,
+      // RSS pubDate requires an exact day; do not invent one for enrollment terms.
+      ...(item.data.datePrecision === "day" && { pubDate: item.data.date }),
       link: `/news/#post-${item.id}`,
     })),
   });
