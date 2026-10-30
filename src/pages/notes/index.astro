@@ -157,6 +157,7 @@ const fmt = (date: Date) =>
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     gap: 1.15rem;
+    align-content: start;
   }
 
   .post {
@@ -273,21 +274,7 @@ const fmt = (date: Date) =>
 </style>
 
 <script>
-  const filters = document.querySelectorAll<HTMLButtonElement>("[data-filter]");
-  const items = document.querySelectorAll<HTMLElement>("[data-notes] [data-category]");
+  import { initCategoryFilters } from "../../lib/category-filters";
 
-  filters.forEach((button) => {
-    button.addEventListener("click", () => {
-      const value = button.dataset.filter;
-
-      filters.forEach((other) =>
-        other.setAttribute("aria-pressed", other === button ? "true" : "false")
-      );
-
-      items.forEach((item) => {
-        const show = value === "all" || item.dataset.category === value;
-        item.toggleAttribute("hidden", !show);
-      });
-    });
-  });
+  initCategoryFilters(document.querySelector<HTMLElement>("[data-notes]"));
 </script>

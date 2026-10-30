@@ -218,6 +218,7 @@ const photosOf = (item: (typeof items)[number]) => [
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     gap: 1.15rem;
+    align-content: start;
   }
 
   .item {
@@ -317,6 +318,7 @@ const photosOf = (item: (typeof items)[number]) => [
     position: relative;
     display: grid;
     place-items: center;
+    height: min(66vh, 620px);
     background: #101216;
   }
 
@@ -462,24 +464,10 @@ const photosOf = (item: (typeof items)[number]) => [
 </style>
 
 <script>
+  import { initCategoryFilters } from "../lib/category-filters";
+
   /* category filters */
-  const filters = document.querySelectorAll<HTMLButtonElement>("[data-filter]");
-  const items = document.querySelectorAll<HTMLElement>("[data-gallery] [data-category]");
-
-  filters.forEach((button) => {
-    button.addEventListener("click", () => {
-      const value = button.dataset.filter;
-
-      filters.forEach((other) =>
-        other.setAttribute("aria-pressed", other === button ? "true" : "false")
-      );
-
-      items.forEach((item) => {
-        const show = value === "all" || item.dataset.category === value;
-        item.toggleAttribute("hidden", !show);
-      });
-    });
-  });
+  initCategoryFilters(document.querySelector<HTMLElement>("[data-gallery]"));
 
   /* lightbox: bigger view with prev/next across the event's photos */
   document.querySelectorAll<HTMLElement>("[data-item]").forEach((item) => {
@@ -490,6 +478,7 @@ const photosOf = (item: (typeof items)[number]) => [
     const photos: string[] = JSON.parse(item.dataset.photos ?? "[]");
     const title = item.dataset.title ?? "";
     const counter = item.querySelector<HTMLElement>("[data-counter]");
+    const thumbStrip = item.querySelector<HTMLElement>(".lb-thumbs");
     const thumbs = Array.from(
       item.querySelectorAll<HTMLButtonElement>("[data-thumb]")
     );
@@ -502,9 +491,16 @@ const photosOf = (item: (typeof items)[number]) => [
       if (counter) counter.textContent = `${index + 1} / ${photos.length}`;
       thumbs.forEach((thumb, j) => {
         thumb.setAttribute("aria-current", j === index ? "true" : "false");
-        if (j === index)
-          thumb.scrollIntoView({ block: "nearest", inline: "nearest" });
       });
+      // Reveal only the thumbnail horizontally; scrollIntoView also moves
+      // the dialog and can push its close button out of view.
+      if (thumbStrip && thumbs[index] && dialog.open) {
+        const thumb = thumbs[index].getBoundingClientRect();
+        const strip = thumbStrip.getBoundingClientRect();
+        const offset = thumb.left < strip.left ? thumb.left - strip.left
+          : thumb.right > strip.right ? thumb.right - strip.right : 0;
+        if (offset) thumbStrip.scrollBy({ left: offset, behavior: "instant" });
+      }
     };
 
     thumbs.forEach((thumb, i) =>
@@ -514,6 +510,7 @@ const photosOf = (item: (typeof items)[number]) => [
     item.querySelector("[data-open]")?.addEventListener("click", () => {
       show(0);
       dialog.showModal();
+      thumbStrip?.scrollTo({ left: 0, behavior: "instant" });
     });
     item
       .querySelector("[data-close]")
@@ -527,8 +524,10 @@ const photosOf = (item: (typeof items)[number]) => [
 
     dialog.addEventListener("keydown", (event) => {
       if (photos.length < 2) return;
-      if (event.key === "ArrowLeft") show(index - 1);
-      if (event.key === "ArrowRight") show(index + 1);
+      if (event.key === "ArrowLeft" || event.key === "ArrowRight") {
+        event.preventDefault();
+        show(index + (event.key === "ArrowLeft" ? -1 : 1));
+      }
     });
 
     // click on the backdrop closes (the body swallows inner clicks)
