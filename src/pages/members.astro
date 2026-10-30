@@ -208,7 +208,7 @@ const alumni = byRole("alumni");
   .prof {
     position: relative;
     display: grid;
-    grid-template-columns: minmax(260px, 26%) 1fr;
+    grid-template-columns: 260px minmax(0, 1fr);
     overflow: hidden;
     scroll-margin-top: 90px; /* clears the sticky site header when linked to */
     transition: border-color 0.15s ease;
@@ -246,7 +246,7 @@ const alumni = byRole("alumni");
 
   .prof-body {
     min-width: 0;
-    padding: clamp(1.4rem, 3vw, 2rem);
+    padding: 1.875rem 2rem;
     align-self: center;
   }
 
@@ -274,10 +274,10 @@ const alumni = byRole("alumni");
   }
 
   .prof-bio {
-    margin-top: 0.9rem;
+    margin-top: 1.0625rem;
     color: var(--ink-2);
     font-size: 0.95rem;
-    max-width: 62ch;
+    line-height: 1.65;
   }
 
   .prof-bio :global(p + p) {
@@ -288,7 +288,7 @@ const alumni = byRole("alumni");
     display: flex;
     flex-wrap: wrap;
     gap: 0.5rem;
-    margin-top: 1.1rem;
+    margin-top: 1.375rem;
   }
 
   .prof-links a,
@@ -348,7 +348,11 @@ const alumni = byRole("alumni");
   /* ---- responsive ---- */
   @media (max-width: 860px) {
     .prof {
-      grid-template-columns: 1fr;
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    .prof-body {
+      padding: clamp(1.4rem, 3vw, 2rem);
     }
 
     .alumni-row {
