@@ -54,8 +54,12 @@ tab.
   roulette without removing their public profile. Alumni never enter the
   roulette.
 - For a professor, choose **Faculty title**: Assistant Professor, Associate
-  Professor, or Professor. This changes the public title without changing the
-  member's role/group.
+  Professor, or Professor. This changes the card and profile title; the section
+  heading remains **Principal Investigator**.
+- The professor's profile pop-up includes **Research interests**, **Education**,
+  and **Professional experiences**, followed by their contact details. Enter
+  each degree with its institution and graduation year, and each position with
+  its dates and organization. Put the most recent entries first.
 - Student pop-ups automatically list papers whose author names match their
   member names. Use **Additional publications** only for papers not already in
   the Publications collection. Ambiguous duplicate names are not matched

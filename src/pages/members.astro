@@ -39,7 +39,7 @@ const alumni = byRole("alumni");
       professor && ProfessorBio && (
         <section class="member-section" aria-labelledby="sec-professor">
           <h2 id="sec-professor" class="section-title">
-            {professor.data.facultyTitle}
+            Principal Investigator
           </h2>
 
           <article class="prof card" id={`member-${professor.id}`}>
@@ -60,7 +60,7 @@ const alumni = byRole("alumni");
                   data-open
                   aria-haspopup="dialog"
                   aria-controls={`member-dialog-${professor.id}`}
-                  aria-label={`Contact ${professor.data.name}`}
+                  aria-label={`About ${professor.data.name}`}
                 >
                   {professor.data.name}
                 </button>
@@ -98,6 +98,9 @@ const alumni = byRole("alumni");
             major={professor.data.major}
             image={professor.data.image}
             variant="contact"
+            interests={professor.data.interests}
+            education={professor.data.education}
+            experience={professor.data.experience}
             email={professor.data.email}
             phone={professor.data.phone}
             office={professor.data.office}

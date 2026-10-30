@@ -267,7 +267,7 @@ content:
         label: Faculty title
         type: select
         default: Professor
-        description: Professor only. Used on the member card and contact pop-up.
+        description: Professor only. Used on the member card and profile pop-up. The section heading remains Principal Investigator.
         options:
           values: [Assistant Professor, Associate Professor, Professor]
       - name: gameEligible
@@ -303,9 +303,46 @@ content:
       - name: interests
         label: Research interests
         type: text
-        description: A short comma-separated summary for students. Not shown for the professor; alumni may leave this empty.
+        description: A short comma-separated summary shown on student cards and in member profile pop-ups, including the professor's.
         options:
           maxlength: 240
+      - name: education
+        label: Education
+        type: object
+        list: true
+        description: Professor only. Degrees shown in the profile pop-up, in the order listed. Put the most recent degree first.
+        fields:
+          - name: degree
+            label: Degree
+            type: string
+            required: true
+          - name: institution
+            label: Institution
+            type: string
+            required: true
+          - name: year
+            label: Graduation year
+            type: number
+            required: true
+      - name: experience
+        label: Professional experiences
+        type: object
+        list: true
+        description: Professor only. Positions shown in the profile pop-up, in the order listed. Put the most recent position first.
+        fields:
+          - name: period
+            label: Dates
+            type: string
+            required: true
+            description: "For example, Mar. 2024 – Present."
+          - name: position
+            label: Position
+            type: string
+            required: true
+          - name: organization
+            label: Organization
+            type: string
+            required: true
       - name: currentResearch
         label: Current research
         type: text
@@ -319,11 +356,11 @@ content:
       - name: phone
         label: Contact phone
         type: string
-        description: Professor only. Shown in the contact pop-up.
+        description: Professor only. Shown with the contact details in the profile pop-up.
       - name: office
         label: Office
         type: string
-        description: Professor only. Building, floor, and room shown in the contact pop-up.
+        description: Professor only. Building, floor, and room shown with the contact details in the profile pop-up.
       - name: publications
         label: Additional publications
         type: string

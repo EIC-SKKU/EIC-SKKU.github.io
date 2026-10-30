@@ -11,6 +11,8 @@ interface Props {
   major?: string;
   image?: string;
   interests?: string;
+  education?: CollectionEntry<"members">["data"]["education"];
+  experience?: CollectionEntry<"members">["data"]["experience"];
   currentResearch?: string;
   publications?: string[];
   linkedPublications?: CollectionEntry<"publications">[];
@@ -33,6 +35,8 @@ const {
   major,
   image,
   interests,
+  education = [],
+  experience = [],
   currentResearch,
   publications = [],
   linkedPublications = [],
@@ -72,19 +76,21 @@ const publicationItems: PublicationSummary[] = [
 
 <dialog
   id={dialogId}
-  class="member-dialog"
-  aria-label={variant === "contact" ? `Contact ${name}` : `About ${name}`}
+  class:list={["member-dialog", { "faculty-dialog": variant === "contact" }]}
+  aria-label={`About ${name}`}
 >
   <div class="dialog-body">
-    <button class="close" type="button" data-close aria-label="Close">
-      <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true">
-        <path
-          d="M6 6l12 12M18 6L6 18"
-          stroke="currentColor"
-          stroke-width="2"
-          stroke-linecap="round"></path>
-      </svg>
-    </button>
+    <div class="dialog-controls">
+      <button class="close" type="button" data-close aria-label="Close">
+        <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true">
+          <path
+            d="M6 6l12 12M18 6L6 18"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"></path>
+        </svg>
+      </button>
+    </div>
 
     <div class="dialog-head">
       <MemberPortrait
@@ -107,6 +113,45 @@ const publicationItems: PublicationSummary[] = [
     </div>
 
     <div class="dialog-info">
+      {variant === "contact" && (interests || education.length > 0 || experience.length > 0) && (
+        <div class="faculty-details">
+          {interests && (
+            <section class="faculty-section" aria-labelledby={`${dialogId}-interests`}>
+              <h4 class="faculty-heading" id={`${dialogId}-interests`}>Interests</h4>
+              <p class="faculty-text">{interests}</p>
+            </section>
+          )}
+          {education.length > 0 && (
+            <section class="faculty-section" aria-labelledby={`${dialogId}-education`}>
+              <h4 class="faculty-heading" id={`${dialogId}-education`}>Education</h4>
+              <ul class="education-list">
+                {education.map((entry) => (
+                  <li>
+                    <p><span class="entry-title">{entry.degree}</span><span class="entry-detail">{entry.institution}</span></p>
+                    <time class="education-year" datetime={String(entry.year)}>{entry.year}</time>
+                  </li>
+                ))}
+              </ul>
+            </section>
+          )}
+          {experience.length > 0 && (
+            <section class="faculty-section" aria-labelledby={`${dialogId}-experience`}>
+              <h4 class="faculty-heading" id={`${dialogId}-experience`}>Professional experiences</h4>
+              <ul class="experience-list">
+                {experience.map((entry) => (
+                  <li>
+                    <p class="experience-period">{entry.period}</p>
+                    <div>
+                      <p class="entry-title">{entry.position}</p>
+                      <p class="entry-detail">{entry.organization}</p>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            </section>
+          )}
+        </div>
+      )}
       {
         variant === "profile" && currentResearch && (
           <>
@@ -153,32 +198,32 @@ const publicationItems: PublicationSummary[] = [
           </section>
         )
       }
-      {
-        email && (
-          <>
+      <div class:list={{ "faculty-contact": variant === "contact" }}>
+        {email && (
+          <div>
             <p class="label">Email</p>
             <a class="email-link" href={`mailto:${normalizeEmail(email)}`}>
               {formatEmail(email)}
             </a>
-          </>
-        )
-      }
+          </div>
+        )}
 
-      {variant === "contact" && phone && (
-        <>
-          <p class="label">Phone</p>
-          <a class="contact-link" href={`tel:${phone.replace(/[^+\d]/g, "")}`}>
-            {phone}
-          </a>
-        </>
-      )}
+        {variant === "contact" && phone && (
+          <div>
+            <p class="label">Phone</p>
+            <a class="contact-link" href={`tel:${phone.replace(/[^+\d]/g, "")}`}>
+              {phone}
+            </a>
+          </div>
+        )}
 
-      {variant === "contact" && office && (
-        <>
-          <p class="label">Office</p>
-          <p class="value">{office}</p>
-        </>
-      )}
+        {variant === "contact" && office && (
+          <div class="office">
+            <p class="label">Office</p>
+            <p class="value">{office}</p>
+          </div>
+        )}
+      </div>
 
       {
         externalLinks.length > 0 && (
@@ -209,6 +254,10 @@ const publicationItems: PublicationSummary[] = [
 
   .member-dialog::backdrop {
     background: rgba(20, 24, 31, 0.55);
+  }
+
+  .faculty-dialog {
+    max-width: min(680px, calc(100vw - 2rem));
   }
 
   .dialog-body {
@@ -244,6 +293,18 @@ const publicationItems: PublicationSummary[] = [
   .close:hover {
     background: var(--surface-2);
     color: var(--ink);
+  }
+
+  .faculty-dialog .dialog-controls {
+    position: sticky;
+    top: 1.5rem;
+    z-index: 2;
+    height: 0;
+  }
+
+  .faculty-dialog .close {
+    top: -0.9rem;
+    right: -0.9rem;
   }
 
   .dialog-photo {
@@ -304,6 +365,87 @@ const publicationItems: PublicationSummary[] = [
     font-size: 0.94rem;
     line-height: 1.55;
     color: var(--ink);
+  }
+
+  .faculty-details {
+    margin-block: 1.25rem;
+    padding-bottom: 1.25rem;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .faculty-section + .faculty-section {
+    margin-top: 1.2rem;
+    padding-top: 1.1rem;
+    border-top: 1px solid var(--line);
+  }
+
+  .faculty-heading {
+    margin-bottom: 0.65rem;
+    font-size: 0.78rem;
+    font-weight: 650;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--accent);
+  }
+
+  .faculty-text,
+  .education-list,
+  .experience-list {
+    font-size: 0.92rem;
+    line-height: 1.5;
+  }
+
+  .education-list,
+  .experience-list {
+    display: grid;
+    gap: 0.85rem;
+  }
+
+  .education-list li {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 1rem;
+  }
+
+  .entry-title {
+    font-weight: 550;
+  }
+
+  .education-list .entry-detail::before {
+    content: " · ";
+  }
+
+  .entry-detail,
+  .education-year,
+  .experience-period {
+    color: var(--ink-2);
+  }
+
+  .education-year,
+  .experience-period {
+    font-size: 0.8rem;
+    font-variant-numeric: tabular-nums;
+    padding-top: 0.1rem;
+  }
+
+  .experience-list li {
+    display: grid;
+    grid-template-columns: 10.5rem minmax(0, 1fr);
+    gap: 1rem;
+  }
+
+  .faculty-contact {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1rem;
+  }
+
+  .faculty-contact .label {
+    margin-top: 0;
+  }
+
+  .faculty-contact .office {
+    grid-column: 1 / -1;
   }
 
   .email-link {
@@ -411,6 +553,23 @@ const publicationItems: PublicationSummary[] = [
   @media (max-width: 520px) {
     .dialog-photo {
       width: 84px;
+    }
+
+    .experience-list li,
+    .faculty-contact {
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    .experience-list li {
+      gap: 0.2rem;
+    }
+
+    .education-list .entry-detail {
+      display: block;
+    }
+
+    .education-list .entry-detail::before {
+      content: none;
     }
   }
 </style>

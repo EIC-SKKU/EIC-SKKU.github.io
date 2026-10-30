@@ -70,7 +70,12 @@ current: "Engineer, Samsung Electronics — Memory Division"
 
 The professor's Markdown body (below the frontmatter) is rendered as a short bio.
 Their `facultyTitle` can be `Assistant Professor`, `Associate Professor`, or
-`Professor`. Student pop-ups automatically include matching papers from the
+`Professor`; the section heading stays `Principal Investigator`. Their profile
+pop-up includes `interests`, `education` entries (`degree`, `institution`, `year`),
+and `experience` entries (`period`, `position`, `organization`), followed by contact
+details. Keep education and experience in newest-first order.
+
+Student pop-ups automatically include matching papers from the
 Publications collection; `publications` can contain additional free-form entries.
 The LinkedIn icon appears only when `links.linkedin` contains a full profile URL.
 Leave it empty to hide the icon.

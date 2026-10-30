@@ -35,6 +35,17 @@ const members = defineCollection({
     major: z.string().optional(),
     image: z.string().optional(),
     interests: z.string().optional(),
+    /** professor's education and professional background, shown in the profile pop-up */
+    education: z.array(z.object({
+      degree: z.string(),
+      institution: z.string(),
+      year: z.number().int(),
+    })).default([]),
+    experience: z.array(z.object({
+      period: z.string(),
+      position: z.string(),
+      organization: z.string(),
+    })).default([]),
     /** rough description of what they're working on right now */
     currentResearch: z.string().optional(),
     /** additional free-form entries, alongside automatically matched papers */
