@@ -2,6 +2,7 @@
 import MemberDialog from "./MemberDialog.astro";
 import MemberSocialLinks from "./MemberSocialLinks.astro";
 import MemberPortrait from "./MemberPortrait.astro";
+import MailIcon from "./MailIcon.astro";
 import type { CollectionEntry } from "astro:content";
 import { formatEmail, normalizeEmail } from "../lib/email";
 
@@ -126,7 +127,7 @@ const externalLinks = [
     </div>
     <p class="position">{position}{track && ` · ${track}`}</p>
     {interests && <p class="interests">{interests}</p>}
-    {email && <a class="email" href={`mailto:${normalizeEmail(email)}`}>{formatEmail(email)}</a>}
+    {email && <a class="email" href={`mailto:${normalizeEmail(email)}`} aria-label={`Email ${name} at ${normalizeEmail(email)}`}><MailIcon /><span>{formatEmail(email)}</span></a>}
   </div>
 
   <MemberDialog
@@ -413,6 +414,7 @@ const externalLinks = [
     z-index: 1;
     display: inline-flex;
     align-items: center;
+    gap: 0.4rem;
     align-self: center;
     max-width: 100%;
     margin-top: auto;
@@ -434,5 +436,9 @@ const externalLinks = [
     border-color: var(--accent-line);
     background: var(--accent-tint);
     color: var(--accent-strong);
+  }
+
+  .email span {
+    min-width: 0;
   }
 </style>

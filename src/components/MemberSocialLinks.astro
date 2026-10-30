@@ -23,7 +23,7 @@ const profiles = [
 ---
 
 {profiles.length > 0 && (
-  <span class:list={["member-social-links", { "single-link": profiles.length === 1 }]} role="group" aria-label={`Profiles for ${name}`}>
+  <span class="member-social-links" role="group" aria-label={`Profiles for ${name}`}>
     {profiles.map((profile) => (
       <a
         class:list={["profile-link", profile.className]}
@@ -42,21 +42,16 @@ const profiles = [
 )}
 
 <style>
-  /* Keep links beside the first line; a single link needs only its own space. */
+  /* The name flexes on the left; the right-aligned group fits its actual links. */
   .member-social-links {
     position: relative;
     display: inline-flex;
     align-items: center;
-    justify-content: space-evenly;
     flex: none;
-    width: 72px;
+    gap: 4px;
     height: 28px;
     padding-inline-start: 8px;
     box-sizing: border-box;
-  }
-
-  .single-link {
-    width: 40px;
   }
 
   .member-social-links::before {

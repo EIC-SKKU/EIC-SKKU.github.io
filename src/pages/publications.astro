@@ -81,7 +81,7 @@ const groupsFor = (years: number[]) => {
     .filter((section) => section.items.length > 0);
 };
 
-/* every non-professor member referenced as an author anywhere on this page
+/* every member referenced as an author anywhere on this page
    gets exactly one pop-up rendered (deduplicated), which the citation
    links/buttons in PublicationItem open in place — no page navigation */
 const matchedMemberIds = new Set(
@@ -89,9 +89,7 @@ const matchedMemberIds = new Set(
     .flatMap((p) => splitAuthors(p.data.authors))
     .filter((part) => !isAuthorSeparator(part))
     .map((part) => membersByName.get(normalizeAuthorName(part)))
-    .filter(
-      (m): m is MatchedMember => m !== undefined && m.role !== "professor"
-    )
+    .filter((m): m is MatchedMember => m !== undefined)
     .map((m) => m.id)
 );
 const popupMembers = [...matchedMemberIds]
@@ -156,15 +154,22 @@ const hasMarkers = pubs.some((p) => /[*⁺]/.test(p.data.authors));
       <MemberDialog
         dialogId={`member-dialog-${m.id}`}
         name={m.data.name}
-        position={ROLE_LABELS[m.data.role] ?? m.data.role}
+        position={m.data.role === "professor"
+          ? m.data.facultyTitle
+          : ROLE_LABELS[m.data.role] ?? m.data.role}
+        variant={m.data.role === "professor" ? "contact" : "profile"}
         track={m.data.track}
         major={m.data.major}
         image={m.data.image}
         interests={m.data.interests}
+        education={m.data.education}
+        experience={m.data.experience}
         currentResearch={m.data.currentResearch}
         publications={m.data.publications}
         linkedPublications={publicationsByMember.get(m.id)}
         email={m.data.email}
+        phone={m.data.phone}
+        office={m.data.office}
         links={m.data.links}
       />
     ))

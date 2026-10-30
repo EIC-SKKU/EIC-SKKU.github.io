@@ -55,10 +55,9 @@ role: phd            # professor | phd | msphd | ms | undergrad | alumni
 gameEligible: true   # show this active member on the private /game page
 image: "/images/members/minjun-park.svg"
 interests: "LLM quantization, efficient inference systems"
-links:               # shown on hover (desktop) / as buttons (mobile)
-  about: "#"
-  website: "#"
-  scholar: "#"
+links:               # optional; omit profiles the member does not have
+  scholar: "https://scholar.google.com/citations?user=PROFILE_ID"
+  linkedin: "https://www.linkedin.com/in/profile-id/"
 order: 1             # sort position within the role section
 ---
 ```
@@ -72,6 +71,9 @@ current: "Engineer, Samsung Electronics — Memory Division"
 ```
 
 The professor's Markdown body (below the frontmatter) is rendered as a short bio.
+Use **Professor profile** in Pages CMS to edit that biography, academic history,
+and contact details; those faculty-only controls are omitted from the general
+Members form. The underlying member file and author references stay unchanged.
 Their `facultyTitle` can be `Assistant Professor`, `Associate Professor`, or
 `Professor`; the section heading stays `Principal Investigator`. Their profile
 pop-up includes `interests`, `education` entries (`degree`, `institution`, `year`),
@@ -88,8 +90,9 @@ Leave it empty to hide the icon.
 Grouped by `year` (newest first), sorted by descending `order` within a year.
 Order 1 is oldest; higher numbers are newer. Omit `order` for a new paper and the
 build assigns the next number above the existing maximum using Git addition
-history. Computed values stay out of the source files/CMS; an explicit number
-can be supplied when needed.
+history. Computed values stay out of the source files/CMS. The manual order
+field is hidden in Pages CMS; an explicit frontmatter number can still be
+supplied in GitHub when needed.
 
 ```yaml
 ---

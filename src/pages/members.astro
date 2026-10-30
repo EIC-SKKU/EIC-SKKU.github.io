@@ -5,6 +5,7 @@ import PageHeader from "../components/PageHeader.astro";
 import MemberCard from "../components/MemberCard.astro";
 import MemberDialog from "../components/MemberDialog.astro";
 import ScholarLink from "../components/ScholarLink.astro";
+import MailIcon from "../components/MailIcon.astro";
 import { ROLE_LABELS } from "../lib/roles";
 import { formatEmail, normalizeEmail } from "../lib/email";
 import { buildMemberPublications } from "../lib/member-publications";
@@ -75,8 +76,8 @@ const alumni = byRole("alumni");
               </div>
               <div class="prof-links">
                 {professor.data.email && (
-                  <a class="chip" href={`mailto:${normalizeEmail(professor.data.email)}`}>
-                    {formatEmail(professor.data.email)}
+                  <a class="chip" href={`mailto:${normalizeEmail(professor.data.email)}`} aria-label={`Email ${professor.data.name} at ${normalizeEmail(professor.data.email)}`}>
+                    <MailIcon /><span>{formatEmail(professor.data.email)}</span>
                   </a>
                 )}
                 <ScholarLink name={professor.data.name} url={professor.data.links.scholar} />

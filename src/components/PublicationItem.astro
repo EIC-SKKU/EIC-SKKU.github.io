@@ -50,13 +50,7 @@ const linkLabels: Record<string, string> = {
         parts.map((part) => {
           const m = matchMember(part);
           if (!m) return part;
-          // professor links back to her full profile on the Members page;
-          // everyone else opens their existing member pop-up right here
-          return m.role === "professor" ? (
-            <a class="member-name" href={`/members/#member-${m.id}`}>
-              {part}
-            </a>
-          ) : (
+          return (
             <button
               class="member-name member-name-btn"
               type="button"
@@ -135,11 +129,7 @@ const linkLabels: Record<string, string> = {
               {parts.map((part) => {
                 const m = matchMember(part);
                 if (!m) return part;
-                return m.role === "professor" ? (
-                  <a class="member-name" href={`/members/#member-${m.id}`}>
-                    {part}
-                  </a>
-                ) : (
+                return (
                   <button
                     class="member-name member-name-btn"
                     type="button"
@@ -155,44 +145,26 @@ const linkLabels: Record<string, string> = {
 
             {matchedAuthors.length > 0 && (
               <div class="author-avatars">
-                {matchedAuthors.map(({ name, match }) =>
-                  match.role === "professor" ? (
-                    <a
-                      class="author-avatar"
-                      href={`/members/#member-${match.id}`}
-                    >
-                      <MemberPortrait
-                        class="author-portrait"
-                        src={match.image ?? "/images/members/placeholder.svg"}
-                        alt=""
-                        width="40"
-                        height="40"
-                        loading="lazy"
-                        decoding="async"
-                      />
-                      <span>{name}</span>
-                    </a>
-                  ) : (
-                    <button
-                      class="author-avatar"
-                      type="button"
-                      data-open
-                      aria-haspopup="dialog"
-                      aria-controls={`member-dialog-${match.id}`}
-                    >
-                      <MemberPortrait
-                        class="author-portrait"
-                        src={match.image ?? "/images/members/placeholder.svg"}
-                        alt=""
-                        width="40"
-                        height="40"
-                        loading="lazy"
-                        decoding="async"
-                      />
-                      <span>{name}</span>
-                    </button>
-                  )
-                )}
+                {matchedAuthors.map(({ name, match }) => (
+                  <button
+                    class="author-avatar"
+                    type="button"
+                    data-open
+                    aria-haspopup="dialog"
+                    aria-controls={`member-dialog-${match.id}`}
+                  >
+                    <MemberPortrait
+                      class="author-portrait"
+                      src={match.image ?? "/images/members/placeholder.svg"}
+                      alt=""
+                      width="40"
+                      height="40"
+                      loading="lazy"
+                      decoding="async"
+                    />
+                    <span>{name}</span>
+                  </button>
+                ))}
               </div>
             )}
 

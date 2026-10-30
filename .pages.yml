@@ -40,10 +40,6 @@ components:
     type: object
     label: Profile links
     fields:
-      - name: about
-        label: About page
-        type: string
-        description: Full URL or site path. Leave empty when unavailable.
       - name: website
         label: Personal website
         type: string
@@ -56,18 +52,18 @@ components:
         label: LinkedIn
         type: string
         description: Full LinkedIn profile URL including https://. The icon appears only when a URL is provided.
-      - name: orcid
-        label: ORCID
+  faculty_profile_links:
+    type: object
+    label: Profile links
+    fields:
+      - name: scholar
+        label: Google Scholar
         type: string
-        description: Full https://orcid.org/ URL.
-      - name: dblp
-        label: DBLP
+        description: Full Google Scholar profile URL, shown beside the email address.
+      - name: website
+        label: Personal website
         type: string
-        description: Full DBLP profile URL.
-      - name: cv
-        label: CV
-        type: string
-        description: URL or site path to a CV (PDF).
+        description: Optional full URL including https://.
   publication_links:
     type: object
     label: Publication links
@@ -247,6 +243,7 @@ content:
           maxlength: 100
       - name: role
         label: Role
+        description: For the professor's biography, academic background, and contact details, use the separate Professor profile editor.
         type: select
         required: true
         options:
@@ -263,13 +260,6 @@ content:
               label: Undergraduate researcher
             - name: alumni
               label: Alumni
-      - name: facultyTitle
-        label: Faculty title
-        type: select
-        default: Professor
-        description: Professor only. Used on the member card and profile pop-up. The section heading remains Principal Investigator.
-        options:
-          values: [Assistant Professor, Associate Professor, Professor]
       - name: gameEligible
         label: Include in member roulette
         type: boolean
@@ -303,14 +293,93 @@ content:
       - name: interests
         label: Research interests
         type: text
-        description: A short comma-separated summary shown on student cards and in member profile pop-ups, including the professor's.
+        description: A short comma-separated summary shown on student cards and in their About pop-ups.
+        options:
+          maxlength: 240
+      - name: currentResearch
+        label: Current research
+        type: text
+        description: Rough description of what a student is working on right now, shown in their member pop-up. Not shown for the professor.
+        options:
+          maxlength: 240
+      - name: email
+        label: Email
+        type: string
+        description: Optional public email address. Addresses display with _at_ and _dot_ while their email links use the actual address.
+      - name: publications
+        label: Additional publications
+        type: string
+        list: true
+        description: "Papers in Publications are matched automatically by author name. Add only extra papers here, one per line, e.g. Title — Venue, Year."
+      - name: links
+        component: profile_links
+      - name: formerPosition
+        label: Alumni — former position
+        type: string
+        description: Alumni only, for example M.S. Student (2023-2025).
+      - name: current
+        label: Alumni — current position
+        type: string
+        description: Alumni only, for example Engineer, Company - Division.
+      - name: order
+        label: Display order
+        type: number
+        required: true
+        default: 99
+        description: Lower numbers appear first within the same role.
+        options:
+          min: 1
+          max: 999
+
+  - name: professor
+    label: Professor profile
+    type: file
+    path: src/content/members/yulhwa-kim.md
+    format: yaml-frontmatter
+    operations:
+      create: false
+      rename: false
+      delete: false
+    fields:
+      - name: name
+        label: Full name
+        type: string
+        required: true
+        description: Name shown on the professor card and About pop-up.
+        options:
+          maxlength: 100
+      - name: facultyTitle
+        label: Faculty title
+        type: select
+        default: Assistant Professor
+        description: Used on the card and About pop-up. The section heading remains Principal Investigator.
+        options:
+          values: [Assistant Professor, Associate Professor, Professor]
+      - name: major
+        label: Major / department
+        type: string
+        description: "Shown in the About pop-up, e.g. Computer Science, Semiconductor Systems Engineering."
+        options:
+          maxlength: 100
+      - name: image
+        label: Portrait
+        type: image
+        description: Portrait shown on the professor card and About pop-up.
+        options:
+          media: member_images
+          categories: [image]
+          rename: safe
+      - name: interests
+        label: Research interests
+        type: text
+        description: Research interests shown in the About pop-up.
         options:
           maxlength: 240
       - name: education
         label: Education
         type: object
         list: true
-        description: Professor only. Degrees shown in the profile pop-up, in the order listed. Put the most recent degree first.
+        description: Degrees shown in the profile pop-up, in the order listed. Put the most recent degree first.
         fields:
           - name: degree
             label: Degree
@@ -328,7 +397,7 @@ content:
         label: Professional experiences
         type: object
         list: true
-        description: Professor only. Positions shown in the profile pop-up, in the order listed. Put the most recent position first.
+        description: Positions shown in the profile pop-up, in the order listed. Put the most recent position first.
         fields:
           - name: period
             label: Dates
@@ -343,12 +412,6 @@ content:
             label: Organization
             type: string
             required: true
-      - name: currentResearch
-        label: Current research
-        type: text
-        description: Rough description of what a student is working on right now, shown in their member pop-up. Not shown for the professor.
-        options:
-          maxlength: 240
       - name: email
         label: Email
         type: string
@@ -356,39 +419,22 @@ content:
       - name: phone
         label: Contact phone
         type: string
-        description: Professor only. Shown with the contact details in the profile pop-up.
+        description: Shown with the contact details in the profile pop-up.
       - name: office
         label: Office
         type: string
-        description: Professor only. Building, floor, and room shown with the contact details in the profile pop-up.
-      - name: publications
-        label: Additional publications
-        type: string
-        list: true
-        description: "Papers in Publications are matched automatically by author name. Add only extra papers here, one per line, e.g. Title — Venue, Year."
+        description: Building, floor, and room shown with the contact details in the profile pop-up.
       - name: links
-        component: profile_links
-      - name: formerPosition
-        label: Former position
-        type: string
-        description: Alumni only, for example M.S. Student (2023-2025).
-      - name: current
-        label: Current position
-        type: string
-        description: Alumni only, for example Engineer, Company - Division.
-      - name: order
-        label: Display order
-        type: number
-        required: true
-        default: 99
-        description: Lower numbers appear first within the same role.
-        options:
-          min: 1
-          max: 999
+        component: faculty_profile_links
+      - name: gameEligible
+        label: Include in member roulette
+        type: boolean
+        default: true
+        description: Controls whether this person appears on the private /game page. Alumni are always excluded.
       - name: body
         label: Biography
         type: rich-text
-        description: Used for the professor profile. Leave empty for other roles.
+        description: Short introduction shown on the Members page. Detailed education and career entries belong in the fields above.
         options:
           format: markdown
           media: false
@@ -413,6 +459,7 @@ content:
         label: Paper title
         type: text
         required: true
+        description: New papers receive the next publication number automatically.
         options:
           maxlength: 300
       - name: year
@@ -423,9 +470,10 @@ content:
           placeholder: Select a year
           values: [2030, 2029, 2028, 2027, 2026, 2025, 2024, 2023, 2022, 2021, 2020, 2019, 2018, 2017, 2016, 2015, 2014, 2013, 2012, 2011, 2010]
       - name: order
-        label: Publication order (optional)
+        label: Publication order
         type: number
-        description: "1 is oldest; higher numbers appear first within a year. Leave blank for the next available number at build time. Automatic values are not written back into this field."
+        hidden: true
+        description: Assigned automatically for new papers; existing numbers are preserved.
         options:
           min: 1
       - name: authors

@@ -4,6 +4,7 @@ import type { CollectionEntry } from "astro:content";
 import MemberSocialLinks from "./MemberSocialLinks.astro";
 import MemberPortrait from "./MemberPortrait.astro";
 import FacultyProfile from "./FacultyProfile.astro";
+import MailIcon from "./MailIcon.astro";
 
 interface Props {
   name: string;
@@ -179,8 +180,8 @@ const publicationItems: PublicationSummary[] = [
             {email && (
               <div>
                 <p class="label">Email</p>
-                <a class="email-link" href={`mailto:${normalizeEmail(email)}`}>
-                  {formatEmail(email)}
+                <a class="email-link" href={`mailto:${normalizeEmail(email)}`} aria-label={`Email ${name} at ${normalizeEmail(email)}`}>
+                  <MailIcon /><span>{formatEmail(email)}</span>
                 </a>
               </div>
             )}
@@ -334,7 +335,9 @@ const publicationItems: PublicationSummary[] = [
   }
 
   .email-link {
-    display: inline-block;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
     margin-top: 0.2rem;
     font-family: var(--mono);
     font-size: 0.82rem;
@@ -347,6 +350,10 @@ const publicationItems: PublicationSummary[] = [
     color: var(--accent-strong);
     text-decoration: underline;
     text-underline-offset: 3px;
+  }
+
+  .email-link span {
+    min-width: 0;
   }
 
   .profile-publications {

@@ -11,8 +11,8 @@ source of truth, and every saved CMS edit is recorded in Git history.
 3. Install the Pages CMS GitHub App for
    `EIC-SKKU/EIC-SKKU.github.io` only.
 4. Open the repository and select the `main` branch.
-5. Confirm that News, Gallery, Members, Publications, Research, Funded
-   projects, and Notes appear in the editor.
+5. Confirm that News, Gallery, Members, Professor profile, Publications,
+   Research, Funded projects, and Notes appear in the editor.
 
 The repository owner must complete the GitHub App installation. No GitHub
 token or CMS secret belongs in this repository.
@@ -40,6 +40,18 @@ tab.
 
 ## Content conventions
 
+- Use **Members** to add students and update their cards. The professor's
+  biography, faculty title, education, career history, phone, and office have
+  their own **Professor profile** editor, so they do not clutter new student
+  forms. The professor remains in the Members directory for author selection;
+  no member filenames or Notes references change.
+- The editor exposes only supported profile links: website, Google Scholar,
+  and LinkedIn for members; website and Google Scholar for the professor.
+  Unused About-page, ORCID, DBLP, and CV inputs have been removed.
+- The two **Alumni — ...** fields apply only when the role is Alumni. Leave
+  them empty for active students. Pages CMS currently documents static field
+  visibility rather than role-dependent forms, so these fields are labeled
+  explicitly instead of relying on unsupported conditional settings.
 - News summaries should be one or two concise sentences.
 - News can include an optional full story and up to 10 slideshow images. Add
   slideshow images through the News images field; their selected order is their
@@ -55,9 +67,9 @@ tab.
   Use **Include in member roulette** to exclude an active member from the
   roulette without removing their public profile. Alumni never enter the
   roulette.
-- For a professor, choose **Faculty title**: Assistant Professor, Associate
-  Professor, or Professor. This changes the card and profile title; the section
-  heading remains **Principal Investigator**.
+- In **Professor profile**, choose **Faculty title**: Assistant Professor,
+  Associate Professor, or Professor. This changes the card and profile title;
+  the section heading remains **Principal Investigator**.
 - The professor's profile pop-up includes **Research interests**, **Education**,
   and **Professional experiences**, followed by their contact details. Enter
   each degree with its institution and graduation year, and each position with
@@ -74,12 +86,12 @@ tab.
 - Publication order uses **1 for the oldest paper** and higher numbers for newer
   papers. The site keeps newest years first, then higher order first within each
   year/category. Existing papers have been numbered 1–36 in that direction.
-- Leave a new paper's **Publication order** empty to assign the next highest
-  number automatically at build time (currently 37). Multiple new papers are
-  ordered by when they were first added to Git; ties use stable filenames.
-  This computed value is not written back to the CMS field. If you need a fixed
-  number that will not shift when other entries are removed or explicitly
-  renumbered, enter it manually.
+- New papers receive the next highest publication number automatically at
+  build time. The manual order field is hidden in the editor; existing stored
+  numbers are preserved. Multiple new papers are ordered by when they were
+  first added to Git; ties use stable filenames. Computed values are not
+  written back to content. An exceptional fixed override can still be made
+  through the Markdown frontmatter in GitHub.
 - Feature only the strongest gallery images in the home page carousel.
 - Leave optional fields empty instead of entering placeholder text or `#`.
 - For Notes, fill in Title and Summary, then write the article in the prominent
@@ -105,3 +117,16 @@ npm run build
 ```
 
 Content editors do not need to run the site locally for normal CMS updates.
+
+## Editor configuration notes
+
+The professor editor uses Pages CMS's documented [single-file content
+type](https://pagescms.org/docs/configuration/content/). The shared Members
+collection is retained because Notes references it. The existing
+[`settings.content.merge: true`](https://pagescms.org/docs/configuration/settings/#content)
+preserves stored fields outside each editor's form, including the professor's
+role and display order. The publication number uses the documented
+[`hidden` field setting](https://pagescms.org/docs/configuration/content/fields/).
+
+After configuration changes are pushed, reload Pages CMS or reopen the
+repository if its cached form still shows the old fields.
