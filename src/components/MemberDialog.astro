@@ -168,32 +168,30 @@ const publicationItems: PublicationSummary[] = [
         )
       }
       {
-        variant === "profile" && (
+        variant === "profile" && publicationItems.length > 0 && (
           <section class="profile-publications" aria-labelledby={`${dialogId}-publications`}>
             <h4 id={`${dialogId}-publications`} class="publications-heading">
               Publications
-              {publicationItems.length > 0 && <span class="publication-count">{publicationItems.length}</span>}
+              <span class="publication-count">{publicationItems.length}</span>
             </h4>
-            {publicationItems.length > 0 ? (
-              <ul class="pub-list">
-                {publicationItems.map((pub) => (
-                  <li>
-                    <svg class="paper-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                      <path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z" />
-                      <path d="M14 3v5h5M9 13h6M9 17h4" />
-                    </svg>
-                    <div class="paper-summary">
-                      {pub.href ? (
-                        <a class="paper-title" href={pub.href} target="_blank" rel="noopener noreferrer">
-                          {pub.title}<span class="visually-hidden"> (opens in a new tab)</span>
-                        </a>
-                      ) : <span class="paper-title">{pub.title}</span>}
-                      {pub.detail && <p class="paper-detail">{pub.detail}</p>}
-                    </div>
-                  </li>
-                ))}
-              </ul>
-            ) : <p class="empty-publications">No publications listed yet.</p>}
+            <ul class="pub-list">
+              {publicationItems.map((pub) => (
+                <li>
+                  <svg class="paper-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z" />
+                    <path d="M14 3v5h5M9 13h6M9 17h4" />
+                  </svg>
+                  <div class="paper-summary">
+                    {pub.href ? (
+                      <a class="paper-title" href={pub.href} target="_blank" rel="noopener noreferrer">
+                        {pub.title}<span class="visually-hidden"> (opens in a new tab)</span>
+                      </a>
+                    ) : <span class="paper-title">{pub.title}</span>}
+                    {pub.detail && <p class="paper-detail">{pub.detail}</p>}
+                  </div>
+                </li>
+              ))}
+            </ul>
           </section>
         )
       }
@@ -322,17 +320,18 @@ const publicationItems: PublicationSummary[] = [
 
   .dialog-name-row {
     display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 0.25rem 0.4rem;
+    align-items: flex-start;
+    gap: 0.6rem;
   }
 
   .dialog-title h3 {
-    flex: 1 1 auto;
+    flex: 1;
     min-width: 0;
     max-width: 100%;
     overflow-wrap: anywhere;
     font-size: 1.4rem;
+    line-height: 1.3;
+    text-wrap: wrap;
   }
 
   .position {
@@ -536,12 +535,6 @@ const publicationItems: PublicationSummary[] = [
     margin-top: 0.3rem;
     font-size: 0.75rem;
     color: var(--ink-3);
-  }
-
-  .empty-publications {
-    margin-top: 0.5rem;
-    font-size: 0.88rem;
-    color: var(--ink-2);
   }
 
   .links {
