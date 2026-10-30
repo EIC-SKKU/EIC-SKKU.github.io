@@ -28,4 +28,5 @@ abstract: Pruning has emerged as a promising direction for accelerating large
 area: efficient-ai
 links:
   paper: https://arxiv.org/abs/2512.07090
+order: 37
 ---
