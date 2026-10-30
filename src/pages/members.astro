@@ -4,7 +4,7 @@ import Base from "../layouts/Base.astro";
 import PageHeader from "../components/PageHeader.astro";
 import MemberCard from "../components/MemberCard.astro";
 import MemberDialog from "../components/MemberDialog.astro";
-import MemberSocialLinks from "../components/MemberSocialLinks.astro";
+import ScholarLink from "../components/ScholarLink.astro";
 import { ROLE_LABELS } from "../lib/roles";
 import { formatEmail, normalizeEmail } from "../lib/email";
 import { buildMemberPublications } from "../lib/member-publications";
@@ -54,25 +54,18 @@ const alumni = byRole("alumni");
               decoding="async"
             />
             <div class="prof-body">
-              <div class="prof-name-row">
-                <h3>
-                  <button
-                    class="prof-open"
-                    type="button"
-                    data-open
-                    aria-haspopup="dialog"
-                    aria-controls={`member-dialog-${professor.id}`}
-                    aria-label={`About ${professor.data.name}`}
-                  >
-                    {professor.data.name}
-                  </button>
-                </h3>
-                <MemberSocialLinks
-                  name={professor.data.name}
-                  linkedin={professor.data.links.linkedin}
-                  scholar={professor.data.links.scholar}
-                />
-              </div>
+              <h3>
+                <button
+                  class="prof-open"
+                  type="button"
+                  data-open
+                  aria-haspopup="dialog"
+                  aria-controls={`member-dialog-${professor.id}`}
+                  aria-label={`About ${professor.data.name}`}
+                >
+                  {professor.data.name}
+                </button>
+              </h3>
               <p class="prof-role">{professor.data.facultyTitle}</p>
               {professor.data.major && (
                 <p class="prof-major">{professor.data.major}</p>
@@ -86,6 +79,7 @@ const alumni = byRole("alumni");
                     {formatEmail(professor.data.email)}
                   </a>
                 )}
+                <ScholarLink name={professor.data.name} url={professor.data.links.scholar} />
                 {professor.data.links.website && (
                   <a class="chip" href={professor.data.links.website}>Website</a>
                 )}
@@ -256,19 +250,11 @@ const alumni = byRole("alumni");
   }
 
   .prof-body h3 {
-    flex: 1;
     min-width: 0;
     max-width: 100%;
     overflow-wrap: anywhere;
     font-size: 1.7rem;
-    line-height: 1.3;
     text-wrap: wrap;
-  }
-
-  .prof-name-row {
-    display: flex;
-    align-items: flex-start;
-    gap: 0.6rem;
   }
 
   .prof-role {

@@ -1,0 +1,255 @@
+---
+import type { CollectionEntry } from "astro:content";
+import { formatEmail, normalizeEmail } from "../lib/email";
+import MemberPortrait from "./MemberPortrait.astro";
+import ScholarLink from "./ScholarLink.astro";
+
+interface Props {
+  dialogId: string;
+  name: string;
+  position: string;
+  major?: string;
+  image: string;
+  interests?: string;
+  education: CollectionEntry<"members">["data"]["education"];
+  experience: CollectionEntry<"members">["data"]["experience"];
+  email?: string;
+  phone?: string;
+  office?: string;
+  scholar?: string;
+  website?: string;
+}
+
+const { dialogId, name, position, major, image, interests, education, experience,
+  email, phone, office, scholar, website } = Astro.props;
+---
+
+<div class="faculty-profile">
+  <header class="faculty-header">
+    <MemberPortrait class="faculty-photo" src={image} alt="" width="400" height="400" loading="lazy" decoding="async" />
+    <div class="faculty-title">
+      <h3>{name}</h3>
+      <p class="faculty-role">{position}</p>
+      {major && <p class="faculty-major">{major}</p>}
+    </div>
+  </header>
+
+  {(email || scholar || website) && (
+    <div class="faculty-links" role="group" aria-label={`Contact and profiles for ${name}`}>
+      {email && <a class="chip faculty-email" href={`mailto:${normalizeEmail(email)}`}>{formatEmail(email)}</a>}
+      <ScholarLink name={name} url={scholar} />
+      {website && <a class="chip" href={website} target="_blank" rel="noopener noreferrer">Website<span class="visually-hidden"> (opens in a new tab)</span></a>}
+    </div>
+  )}
+
+  <div class="faculty-sections">
+    {interests && (
+      <section class="faculty-section" aria-labelledby={`${dialogId}-interests`}>
+        <h4 id={`${dialogId}-interests`}>Interests</h4>
+        <p class="faculty-interests">{interests}</p>
+      </section>
+    )}
+
+    {education.length > 0 && (
+      <section class="faculty-section" aria-labelledby={`${dialogId}-education`}>
+        <h4 id={`${dialogId}-education`}>Education</h4>
+        <ul class="academic-list education-list">
+          {education.map((entry) => (
+            <li>
+              <p class="academic-summary"><strong>{entry.degree}</strong><span class="academic-detail">{entry.institution}</span></p>
+              <time class="academic-date" datetime={String(entry.year)}>{entry.year}</time>
+            </li>
+          ))}
+        </ul>
+      </section>
+    )}
+
+    {experience.length > 0 && (
+      <section class="faculty-section" aria-labelledby={`${dialogId}-experience`}>
+        <h4 id={`${dialogId}-experience`}>Professional experiences</h4>
+        <ul class="academic-list experience-list">
+          {experience.map((entry) => (
+            <li>
+              <p class="academic-summary"><strong>{entry.position}</strong><span class="academic-detail">{entry.organization}</span></p>
+              <p class="academic-date">{entry.period}</p>
+            </li>
+          ))}
+        </ul>
+      </section>
+    )}
+  </div>
+
+  {(phone || office) && (
+    <dl class="faculty-contact">
+      {phone && (
+        <div>
+          <dt>Phone</dt>
+          <dd><a href={`tel:${phone.replace(/[^+\d]/g, "")}`}>{phone}</a></dd>
+        </div>
+      )}
+      {office && (
+        <div>
+          <dt>Office</dt>
+          <dd>{office}</dd>
+        </div>
+      )}
+    </dl>
+  )}
+</div>
+
+<style>
+  .faculty-profile {
+    min-width: 0;
+  }
+
+  .faculty-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding-right: 2rem;
+  }
+
+  .faculty-photo {
+    width: 80px;
+    flex: none;
+    border-radius: var(--radius-sm);
+  }
+
+  .faculty-title {
+    min-width: 0;
+  }
+
+  .faculty-title h3 {
+    font-size: 1.5rem;
+    line-height: 1.25;
+    overflow-wrap: anywhere;
+  }
+
+  .faculty-role {
+    margin-top: 0.3rem;
+    font-size: 0.87rem;
+    font-weight: 550;
+    color: var(--accent);
+  }
+
+  .faculty-major {
+    margin-top: 0.25rem;
+    font-size: 0.82rem;
+    color: var(--ink-2);
+  }
+
+  .faculty-links {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.45rem;
+    margin-top: 0.9rem;
+  }
+
+  .faculty-email {
+    max-width: 100%;
+    overflow-wrap: anywhere;
+  }
+
+  .faculty-sections {
+    display: grid;
+    gap: 1.25rem;
+    margin-top: 1.4rem;
+    font-size: 0.9rem;
+    line-height: 1.5;
+  }
+
+  h4 {
+    margin-bottom: 0.5rem;
+    font-size: 0.9rem;
+    font-weight: 650;
+    letter-spacing: 0;
+  }
+
+  .faculty-interests {
+    color: var(--ink-2);
+  }
+
+  .academic-list {
+    display: grid;
+    gap: 0.9rem;
+  }
+
+  .academic-list li {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: baseline;
+    gap: 0.2rem 1rem;
+  }
+
+  .academic-summary {
+    min-width: 0;
+    overflow-wrap: anywhere;
+  }
+
+  .academic-summary strong {
+    font-weight: 550;
+  }
+
+  .academic-detail {
+    color: var(--ink-2);
+  }
+
+  .academic-detail::before {
+    content: " · ";
+  }
+
+  .academic-date {
+    color: var(--ink-2);
+    font-size: 0.78rem;
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+  }
+
+  .faculty-contact {
+    display: grid;
+    grid-template-columns: minmax(0, 0.7fr) minmax(0, 1fr);
+    gap: 1rem;
+    margin-top: 1.4rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--line);
+    font-size: 0.84rem;
+    line-height: 1.5;
+  }
+
+  .faculty-contact dt {
+    margin-bottom: 0.2rem;
+    color: var(--ink-2);
+    font-size: 0.76rem;
+  }
+
+  .faculty-contact dd {
+    margin: 0;
+    overflow-wrap: anywhere;
+  }
+
+  .faculty-contact a:hover {
+    color: var(--accent);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+
+  @media (max-width: 520px) {
+    .faculty-photo {
+      width: 72px;
+    }
+
+    .faculty-header {
+      gap: 0.8rem;
+    }
+
+    .academic-list li,
+    .faculty-contact {
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    .academic-date {
+      white-space: normal;
+    }
+  }
+</style>

@@ -1,0 +1,40 @@
+---
+interface Props {
+  name: string;
+  url?: string;
+}
+
+const { name, url } = Astro.props;
+const href = url?.trim();
+---
+
+{href && (
+  <a
+    class="chip scholar-link"
+    href={href}
+    target="_blank"
+    rel="noopener noreferrer"
+    aria-label={`${name} on Google Scholar (opens in a new tab)`}
+  >
+    <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+      <path d="M12 24a7 7 0 1 0 0-14 7 7 0 0 0 0 14Zm0-24L0 9.5l4.875 3.875C6.154 10.74 8.866 9 12 9s5.846 1.74 7.125 4.375L24 9.5 12 0Z" />
+    </svg>
+    Google Scholar
+  </a>
+)}
+
+<style>
+  .scholar-link {
+    position: relative;
+    z-index: 1;
+    gap: 0.4rem;
+    color: var(--accent);
+    white-space: nowrap;
+  }
+
+  .scholar-link svg {
+    flex: none;
+    width: 15px;
+    height: 15px;
+  }
+</style>

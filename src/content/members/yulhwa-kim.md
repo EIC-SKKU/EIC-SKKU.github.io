@@ -36,6 +36,7 @@ order: 1
 gameEligible: true
 labLead: false
 ---
-Yulhwa Kim is an Assistant Professor in the Department of Semiconductor Systems Engineering at Sungkyunkwan University. She received her B.S. in Creative IT Engineering in 2016 and Ph.D. in Convergence IT Engineering in 2022, both from POSTECH. From 2022 to 2024, she was a postdoctoral researcher at the Inter-University Semiconductor Research Center (ISRC), Seoul National University.
-
-Her research focuses on advancing the efficiency of AI systems and leveraging AI to solve complex real-world problems. Her interests span a broad range of topics, including efficient AI algorithms, computer architecture, hardware-software co-design, and AI-driven hardware design and automation.
+Yulhwa Kim leads the Efficient & Intelligent Computing (EIC) Lab at
+Sungkyunkwan University. Her group studies how modern AI workloads —
+from large language models to vision systems — can be made radically
+more efficient through co-design of algorithms, software, and silicon.
